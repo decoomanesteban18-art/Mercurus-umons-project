@@ -102,18 +102,24 @@ def sauvegarder_db(data):
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 # --- ROUTES DES PAGES HTML ---
+# 1. Route pour la racine
 @app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+# 2. Route explicite pour login
 @app.get("/login", response_class=HTMLResponse)
 async def read_login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
+# 3. Route pour les autres pages (uniquement si elles existent)
 @app.get("/{page}", response_class=HTMLResponse)
 async def read_any_page(request: Request, page: str):
-    try:
+    # Liste des pages valides pour éviter d'intercepter les fichiers statiques
+    if page in ["index", "dashboard", "register"]: # Ajoute tes noms de fichiers ici
         return templates.TemplateResponse(f"{page}.html", {"request": request})
-    except:
-        return templates.TemplateResponse("login.html", {"request": request})
-
+    # Si la page n'est pas connue, on redirige vers login
+    return templates.TemplateResponse("login.html", {"request": request})
 # --- ROUTES API : AUTHENTIFICATION ---
 
 @app.post("/api/login")
