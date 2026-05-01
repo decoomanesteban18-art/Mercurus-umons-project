@@ -2,13 +2,18 @@ import time
 import math
 from fastapi import FastAPI, Body, Request, HTTPException
 from fastapi.responses import HTMLResponse
-from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, Response
 import json
 import os
 
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    # Au lieu de FileResponse, on renvoie une réponse vide 204 (No Content)
+    # Cela évite de chercher un fichier 'static/favicon.ico' qui n'existe pas
+    return Response(status_code=204)
 # ===========================================================================
 # MODULE GPS
 # ===========================================================================
@@ -103,29 +108,18 @@ def sauvegarder_db(data):
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 # --- ROUTES DES PAGES HTML ---
-@app.get('/favicon.ico', include_in_schema=False)
-async def favicon():
-    return FileResponse(os.path.join("static", "favicon.ico"))
-# 1. Route pour la racine
 @app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-# 2. Route explicite pour login
 @app.get("/login", response_class=HTMLResponse)
 async def read_login(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
-# 3. Route pour les autres pages (uniquement si elles existent)
 @app.get("/{page}", response_class=HTMLResponse)
 async def read_any_page(request: Request, page: str):
-    # On vérifie si le fichier existe physiquement dans le dossier templates
-    path = os.path.join("templates", f"{page}.html")
-    if os.path.exists(path):
+    try:
         return templates.TemplateResponse(f"{page}.html", {"request": request})
-    
-    # Si la page n'existe pas, on renvoie vers login au lieu de crash
-    return templates.TemplateResponse("login.html", {"request": request})
+    except:
+        return templates.TemplateResponse("login.html", {"request": request})
+
 # --- ROUTES API : AUTHENTIFICATION ---
 
 @app.post("/api/login")
