@@ -111,15 +111,16 @@ def sauvegarder_db(data):
 @app.get("/", response_class=HTMLResponse)
 @app.get("/login", response_class=HTMLResponse)
 async def read_login(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    # Utilisation explicite de name= et context=
+    return templates.TemplateResponse(name="login.html", context={"request": request})
 
 @app.get("/{page}", response_class=HTMLResponse)
 async def read_any_page(request: Request, page: str):
     try:
-        return templates.TemplateResponse(f"{page}.html", {"request": request})
+        # Utilisation explicite de name= et context=
+        return templates.TemplateResponse(name=f"{page}.html", context={"request": request})
     except:
-        return templates.TemplateResponse("login.html", {"request": request})
-
+        return templates.TemplateResponse(name="login.html", context={"request": request})
 # --- ROUTES API : AUTHENTIFICATION ---
 
 @app.post("/api/login")
