@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="/static/js/app/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Négociations | Mercurus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/app/interface/style.css">
+    <link rel="stylesheet" href="/static/css/app/gestion-demandes/body.css">
+    <style>
+        .contrainte-header {
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 600; color: #1d4ed8; margin-bottom: 12px; font-size: 0.82rem;
+        }
+        .contrainte-troncon {
+            background: #dbeafe; color: #1e40af; border-radius: 20px;
+            padding: 2px 10px; font-size: 0.75rem; font-weight: 500; margin-left: 4px;
+        }
+        .contrainte-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+        }
+        .contrainte-item {
+            display: flex; align-items: center; gap: 8px;
+            background: #fff; border: 1px solid #bfdbfe; border-radius: 8px;
+            padding: 8px 12px;
+        }
+        .contrainte-item i { color: #3b82f6; width: 14px; text-align: center; flex-shrink: 0; }
+        .contrainte-label { color: #64748b; font-size: 0.75rem; flex: 1; }
+        .contrainte-val { font-weight: 600; color: #0f172a; font-size: 0.85rem; white-space: nowrap; }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <img src="/static/Images/Mercurus.png" alt="Mercurus" class="logo-img">
+        </div>
+        <nav class="sidebar-menu">
+            <p class="menu-label">Menu Principal</p>
+            <a href="/dashboard"        class="menu-link"><i class="fa-solid fa-chart-pie"></i> Tableau de bord</a>
+            <a href="/mes-transports"   class="menu-link"><i class="fa-solid fa-truck"></i> Gestion de la flotte</a>
+            <a href="/mes-cycles"       class="menu-link"><i class="fa-solid fa-route"></i> Mes trajets récents</a>
+            <a href="/gestion"          class="menu-link"><i class="fa-solid fa-folder-plus"></i> Console d'offres</a>
+            <a href="/affichage-offres" class="menu-link"><i class="fa-solid fa-magnifying-glass-location"></i> Trouvez une annonce</a>
+            <a href="/gestion-demandes" class="menu-link active"><i class="fa-solid fa-handshake"></i> Négociations</a>
+            <a href="/finances"         class="menu-link"><i class="fa-solid fa-wallet"></i> Finances</a>
+            <div class="menu-divider"></div>
+            <a href="/home" class="menu-link"><i class="fa-solid fa-rocket"></i> Découvrir Mercurus</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div></div>
+            <div class="user-nav">
+                <div class="user-profile">
+                    <div class="user-info">
+                        <span class="user-name" id="display-username">Chargement...</span>
+                        <span class="user-role" id="display-role">Utilisateur</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-scroll-area">
+            <div class="dashboard-body">
+
+                <div class="welcome-section">
+                    <h1>Négociations</h1>
+                    <p class="subtitle">Suivez et gérez toutes vos transactions en cours et archivées</p>
+                </div>
+
+                <!-- ONGLETS -->
+                <div class="tabs-container">
+                    <div class="tabs-header">
+                        <button id="tab-envoyees" class="tab-btn active" onclick="window.switchTab('envoyees')">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Envoyées
+                            <span class="tab-count" id="count-envoyees"></span>
+                        </button>
+                        <button id="tab-recues" class="tab-btn" onclick="window.switchTab('recues')">
+                            <i class="fa-solid fa-inbox"></i>
+                            Reçues
+                            <span class="tab-count" id="count-recues"></span>
+                        </button>
+                        <button id="tab-archivees" class="tab-btn" onclick="window.switchTab('archivees')">
+                            <i class="fa-solid fa-box-archive"></i>
+                            Archivées
+                            <span class="tab-count" id="count-archivees"></span>
+                        </button>
+                    </div>
+
+                    <!-- PANEL : ENVOYÉES -->
+                    <div id="panel-envoyees" class="tab-panel active">
+                        <table class="mercurus-table">
+                            <thead>
+                                <tr>
+                                    <th>Trajet &amp; Détails</th>
+                                    <th>Prix</th>
+                                    <th>Statut</th>
+                                    <th style="text-align:right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-envoyees"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- PANEL : REÇUES -->
+                    <div id="panel-recues" class="tab-panel">
+                        <table class="mercurus-table">
+                            <thead>
+                                <tr>
+                                    <th>Client &amp; Détails</th>
+                                    <th>Prix</th>
+                                    <th>Statut</th>
+                                    <th style="text-align:right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-recues"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- PANEL : ARCHIVÉES -->
+                    <div id="panel-archivees" class="tab-panel">
+                        <div class="archive-notice">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            Vos transactions clôturées sont conservées ici. Elles ne peuvent plus être modifiées.
+                        </div>
+                        <table class="mercurus-table">
+                            <thead>
+                                <tr>
+                                    <th>Trajet &amp; Détails</th>
+                                    <th>Prix</th>
+                                    <th>Décision finale</th>
+                                    <th style="text-align:center;">État</th>
+                                </tr>
+                            </thead>
+                            <tbody id="list-archivees"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODALE : MODIFIER DEMANDE -->
+<div id="modal-edit-demande" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="header-title">
+                <h2><i class="fa-solid fa-pen-to-square"></i> Modifier la demande</h2>
+                <p>Ajustez les détails selon les capacités du véhicule.</p>
+            </div>
+            <button class="btn-close" onclick="toggleModal('modal-edit-demande', false)">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit-id">
+
+            <!-- BLOC CONTRAINTES DE L'OFFRE -->
+            <div id="bloc-contraintes" style="display:none; margin-bottom:16px; border-radius:10px; border:1px solid #bfdbfe; background:#eff6ff; padding:14px 16px; font-size:0.85rem;">
+            </div>
+
+            <div class="settings-section">
+                <span class="section-label">Horaires &amp; Poids</span>
+                <div class="input-grid">
+                    <div class="field-group">
+                        <label>Heure de départ</label>
+                        <input type="time" id="edit-heure-depart">
+                    </div>
+                    <div class="field-group">
+                        <label>Heure d'arrivée</label>
+                        <input type="time" id="edit-heure-arrivee">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label>Poids total (kg)</label>
+                        <small id="max-poids" style="color:#64748b;font-weight:500;font-size:0.75rem;"></small>
+                    </div>
+                    <input type="number" id="edit-poids">
+                </div>
+            </div>
+            <div class="settings-section">
+                <span class="section-label">Dimensions (m)</span>
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+                    <div class="field-group">
+                        <small id="max-long" style="display:block;font-size:0.7rem;color:#64748b;margin-bottom:2px;"></small>
+                        <input type="number" id="edit-longueur" placeholder="Long.">
+                    </div>
+                    <div class="field-group">
+                        <small id="max-larg" style="display:block;font-size:0.7rem;color:#64748b;margin-bottom:2px;"></small>
+                        <input type="number" id="edit-largeur" placeholder="Larg.">
+                    </div>
+                    <div class="field-group">
+                        <small id="max-haut" style="display:block;font-size:0.7rem;color:#64748b;margin-bottom:2px;"></small>
+                        <input type="number" id="edit-hauteur" placeholder="Haut.">
+                    </div>
+                </div>
+            </div>
+            <div class="settings-section">
+                <span class="section-label">Prix</span>
+                <div class="field-group">
+                    <label>Prix proposé (€)</label>
+                    <input type="number" id="edit-prix" style="font-weight:bold;color:#2563eb;">
+                </div>
+            </div>
+        </div>
+        <div id="toast-container" class="toaster">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span id="toast-message">Message ici</span>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="toggleModal('modal-edit-demande', false)">Annuler</button>
+            <button class="btn-save" onclick="validerModification()">Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE : CONFIRMER SUPPRESSION -->
+<div id="modal-delete-confirm" class="modal-overlay">
+    <div class="modal-card" style="max-width:400px; text-align:center;">
+        <div class="modal-body" style="padding:40px 24px;">
+            <div style="width:60px;height:60px;background:#fef2f2;color:#ef4444;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:1.5rem;border:1px solid #fee2e2;">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h2 style="font-size:1.25rem;font-weight:700;color:#0f172a;margin-bottom:8px;">Supprimer la demande ?</h2>
+            <p style="color:#64748b;font-size:0.9rem;line-height:1.5;">
+                Cette action est irréversible. La demande sera définitivement retirée du marché.
+            </p>
+            <input type="hidden" id="delete-id-target">
+        </div>
+        <div class="modal-footer" style="background:#f8fafc;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <button class="btn-cancel" onclick="toggleModal('modal-delete-confirm', false)" style="width:100%;">Annuler</button>
+            <button class="btn-save" onclick="confirmerSuppression()" style="width:100%;background:#ef4444;">Supprimer</button>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/app/gestion-demandes/demandes.js"></script>
+</body>
+</html>

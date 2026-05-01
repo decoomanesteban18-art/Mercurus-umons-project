@@ -1,0 +1,139 @@
+/* --- PAGE CLIENTS CONSTRUCTION --- */
+
+.section-expertise {
+    padding: 60px 10%;
+    background-color: var(--white);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Header de la page */
+.expertise-text h2 {
+    font-size: 2.8rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.expertise-text p {
+    max-width: 800px;
+    margin-bottom: 40px;
+    color: var(--text-light);
+    font-size: 1.15rem;
+    line-height: 1.7;
+}
+
+/* Conteneur des deux piliers (Offreurs vs Demandeurs) */
+.status-flex {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 60px;
+    align-items: stretch;
+}
+
+.status-column {
+    flex: 1;
+    min-width: 320px;
+    background: var(--background);
+    padding: 35px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.status-column:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border-color: var(--secondary-color);
+}
+
+.status-column h4 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Grille des bénéfices spécifiques au secteur */
+.network-grid {
+    list-style: none;
+    padding: 0;
+}
+
+.network-grid li {
+    background: var(--white);
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    border-left: 4px solid var(--secondary-color);
+}
+
+.network-grid li strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1.05rem;
+}
+
+/* Section Impact (Hainaut & Écologie) */
+.project-status {
+    background: var(--white);
+    padding: 50px;
+    border-radius: var(--radius);
+    margin-top: 40px;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.project-status:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border-color: var(--secondary-color);
+}
+
+.project-status h3 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+}
+
+.project-status p {
+    color: var(--text-light);
+}
+
+.rd-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.rd-list li {
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: background 0.3s;
+}
+
+.rd-list li:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.rd-list li strong {
+    color: var(--secondary-color);
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .section-expertise { padding: 40px 5%; }
+    .status-flex { flex-direction: column; }
+    .expertise-text h2 { font-size: 2rem; }
+}

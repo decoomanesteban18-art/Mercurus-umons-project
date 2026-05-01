@@ -1,0 +1,132 @@
+.section-expertise {
+    padding: 50px 50px;
+    background-color: var(--white);
+}
+
+.expertise-text {
+    flex: 1;
+}
+
+.pre-title {
+    display: block;
+    color: var(--secondary-color);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+}
+
+.expertise-text h2 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-top: 24px;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-top: 20px;
+}
+
+.expertise-text p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-top: 4px;
+    margin-bottom: 10px;
+}
+
+.expertise-text strong {
+    color: var(--text-dark);
+}
+
+.project-status {
+    margin-top: 50px;
+}
+
+.status-flex {
+    padding: 30px 0;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap; 
+}
+
+.status-column {
+    flex: 1;
+    min-width: 350px;
+    padding: 24px;
+    background-color: var(--background);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Ajout d'une ombre douce */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Préparation animation */
+    display: flex;
+    flex-direction: column;
+}
+
+.status-column:hover {
+    transform: translateY(-5px); /* Petit effet au survol */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.status-column h4 {
+    color: var(--secondary-color);
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+/* --- LISTES ET RÉSEAUX --- */
+.rd-list, .network-grid {
+    list-style: none;
+    padding: 0;
+}
+
+.rd-list li {
+    margin-bottom: 15px;
+    padding-left: 28px;
+    position: relative;
+    line-height: 1.5;
+    color: var(--text-light);
+}
+
+.rd-list li::before {
+    content: "⚡"; /* Icône plus dynamique que la simple flèche */
+    position: absolute;
+    left: 0;
+    color: var(--secondary-color);
+    font-size: 1rem;
+}
+
+.network-grid li {
+    background: var(--white);
+    padding: 18px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border-left: 5px solid var(--secondary-color); /* Barre latérale distinctive */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    transition: border-color 0.3s ease;
+}
+
+.network-grid li:hover {
+    border-left-color: var(--primary-color); /* Change de couleur au survol */
+}
+
+.network-grid li strong {
+    display: block;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+/* --- TEXTE ET TYPOGRAPHIE --- */
+.expertise-text p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    line-height: 1.8; /* Augmentation de l'interligne pour la lecture */
+    margin: 15px 0;
+}
+
+.expertise-text strong {
+    color: var(--primary-color);
+    font-weight: 700;
+}

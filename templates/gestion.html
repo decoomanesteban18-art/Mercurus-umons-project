@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="/static/js/app/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion | Mercurus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/static/css/app/interface/style.css">
+    <link rel="stylesheet" href="/static/css/app/gestion/body.css?v=1.3">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="/static/Images/Mercurus.png" alt="Mercurus" class="logo-img">
+            </div>
+            
+            <nav class="sidebar-menu">
+                <p class="menu-label">Menu Principal</p>
+                <a href="/dashboard" class="menu-link">
+                    <i class="fa-solid fa-chart-pie"></i> Tableau de bord
+                </a>
+                <a href="/mes-transports" class="menu-link">
+                    <i class="fa-solid fa-truck"></i> Gestion de la flotte
+                </a>
+                <a href="/mes-cycles" class="menu-link">
+                    <i class="fa-solid fa-route"></i> Mes trajets récents
+                </a>
+                <a href="/gestion" class="menu-link active">
+                    <i class="fa-solid fa-folder-plus"></i> Console d'offres
+                </a>
+                <a href="/affichage-offres" class="menu-link">
+                    <i class="fa-solid fa-magnifying-glass-location"></i> Trouvez une annonce
+                </a>
+                <a href="/gestion-demandes" class="menu-link">
+                    <i class="fa-solid fa-handshake"></i> Négociations
+                </a> 
+                <a href="/finances" class="menu-link">
+                    <i class="fa-solid fa-wallet"></i> Finances
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="/home" class="menu-link">
+                    <i class="fa-solid fa-rocket"></i> Découvrir Mercurus
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">         
+            <header class="top-bar">
+                <div class="search-wrapper">
+
+                </div>
+                
+                <div class="user-nav">
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <span class="user-name" id="display-username">Chargement...</span>
+                            <span class="user-role" id="display-role">Utilisateur</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-scroll-area">
+                <div class="dashboard-body">
+                    <div class="welcome-section">
+                        <h1>Vos offres</h1>
+                        <p class="subtitle">Gérez et publiez vos capacités de transport.</p>
+                    </div>
+
+                    <div class="inventory-container">
+                        <div class="category-card">
+                            <div class="card-header">
+                                <div class="header-main">
+                                    <h3 class="under-title">Liste des offres enregistrées</h3>
+                                </div>
+                                <div class="button-group">
+                                    <button class="btn-create-express" onclick="openOffreExpressModal()">
+                                        <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i>
+                                        Express
+                                    </button>
+                                    <button class="btn-create-standard" onclick="openOffreModal()">
+                                        <i class="fa-solid fa-layer-group" style="color:#3b82f6;"></i>
+                                        Depuis un trajet enregistré
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="list-container" id="offres-list">
+                                <div style="text-align: center; padding: 40px; color: #999;">
+                                    <i class="fa-solid fa-box-open" style="font-size: 2.5rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                                    <p>Aucune offre publiée pour le moment.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="offreModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 650px;">
+            
+            <header class="modal-header">
+                <div class="header-main">
+                    <h3><i class="fa-solid fa-paper-plane"></i> Publier une offre</h3>
+                    <div class="stepper-indicator">
+                        <div id="dot-1" class="step-dot active">1</div>
+                        <div class="step-line"></div>
+                        <div id="dot-2" class="step-dot">2</div>
+                        <div class="step-line"></div>
+                        <div id="dot-3" class="step-dot">3</div>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeOffreModal()">&times;</button>
+            </header>
+
+            <form id="form-creation-offre">
+                
+                <div id="error-message-creation" class="modal-error-inline" style="display: none;"></div>
+
+                <!-- STEP 1 : Véhicule + Circuit + Type -->
+                <div id="step-1" class="modal-body active">
+                    <div class="section-title-dim">Configuration du transport</div>
+
+                    <div class="form-group">
+                        <label for="select-camion"><i class="fa-solid fa-truck-front"></i> Véhicule à assigner</label>
+                        <select id="select-camion" required onchange="updateMaxIndicatorsOffre(); captureSnapshotCamion();">
+                            <option value="">-- Sélectionner un véhicule --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="select-cycle"><i class="fa-solid fa-route"></i> Circuit préconfiguré</label>
+                        <select id="select-cycle" required>
+                            <option value="">-- Choisir un itinéraire --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type-marchandise"><i class="fa-solid fa-boxes-stacked"></i> Type de marchandise</label>
+                        <select id="type-marchandise">
+                            <option value="Palette">Palette</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer-actions">
+                        <button type="button" class="btn-primary" onclick="goToStep(2)">
+                            Suivant <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2 : Capacités dynamiques par arrêt (un à la fois) -->
+                <div id="step-2" class="modal-body">
+                    <div class="section-title-dim">Capacités disponibles par arrêt</div>
+
+                    <div id="capacites-par-etape">
+                        <!-- Généré par buildCapacitesForm() -->
+                    </div>
+
+                    <div id="arrets-nav">
+                        <!-- Généré par rafraichirNavArrets() -->
+                    </div>
+                </div>
+
+                <!-- STEP 3 : Tarification -->
+                <div id="step-3" class="modal-body">
+                    <div class="section-title-dim">Tarification du trajet</div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-calendar-day"></i> Date du trajet</label>
+                        <input type="date" id="date-trajet" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-hourglass-end"></i> Expiration de l’offre</label>
+                        <div class="form-row" style="gap: 10px;">
+                            <input type="date" id="expire-date" required>
+                            <input type="time" id="expire-heure" required>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 0.82rem; color: var(--text-muted); background: var(--bg-subtle); padding: 8px 12px; border-radius: 8px;">
+                            <i class="fa-solid fa-circle-info" style="color: var(--accent);"></i>
+                            L’offre sera automatiquement retirée du réseau passé ce délai.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-tag"></i> Tarif pour l’ensemble du trajet</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="tarif-euro-m3-km" step="0.01" min="0" placeholder="Ex : 2.50" style="flex: 1;">
+                            <span style="font-weight: 700; color: var(--text-muted); white-space: nowrap; font-size: 0.95rem;">€ / km</span>
+                        </div>
+                        <p style="margin-top: 10px; font-size: 0.82rem; color: var(--text-muted); background: var(--bg-app); padding: 10px 14px; border-radius: 8px; line-height: 1.6;">
+                            <i class="fa-solid fa-circle-info" style="color: var(--accent-blue);"></i>
+                            Ce tarif est appliqué par kilomètre parcouru entre les arrêts du client. Le prix final est calculé automatiquement en fonction de la distance du trajet sélectionné.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer-actions">
+                        <button type="button" class="btn-secondary" onclick="goToStep(2)">Retour</button>
+                        <button type="submit" class="btn-primary btn-success">
+                            <i class="fa-solid fa-paper-plane"></i> Publier l'offre
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- ======================================================
+         MODAL EXPRESS : trajet libre, pas de cycle préenregistré
+         ====================================================== -->
+    <div id="offreExpressModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 650px;">
+
+            <header class="modal-header">
+                <div class="header-main">
+                    <h3><i class="fa-solid fa-bolt"></i> Offre express</h3>
+                    <div class="stepper-indicator">
+                        <div id="exp-dot-1" class="step-dot active">1</div>
+                        <div class="step-line"></div>
+                        <div id="exp-dot-2" class="step-dot">2</div>
+                        <div class="step-line"></div>
+                        <div id="exp-dot-3" class="step-dot">3</div>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeOffreExpressModal()">&times;</button>
+            </header>
+
+            <form id="form-creation-express">
+
+                <div id="error-message-express" class="modal-error-inline" style="display:none;"></div>
+
+                <!-- STEP 1 : Camion + trajet libre -->
+                <div id="exp-step-1" class="modal-body active">
+                    <div class="section-title-dim">Véhicule &amp; itinéraire</div>
+
+                    <div class="form-group">
+                        <label for="exp-select-camion"><i class="fa-solid fa-truck-front"></i> Véhicule à assigner</label>
+                        <select id="exp-select-camion" required>
+                            <option value="">-- Sélectionner un véhicule --</option>
+                        </select>
+                    </div>
+
+                    <div class="express-route-builder">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-circle-dot"></i> Ville de départ</label>
+                            <input type="text" id="exp-depart" placeholder="Ex : Mouscron" autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fa-solid fa-map-pin"></i> Étapes intermédiaires
+                                <span class="label-hint">(optionnel)</span>
+                            </label>
+                            <div id="exp-etapes-container"></div>
+                            <button type="button" class="btn-add-etape" onclick="ajouterEtapeExpress()">
+                                <i class="fa-solid fa-plus"></i> Ajouter une étape
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-flag-checkered"></i> Ville de destination</label>
+                            <input type="text" id="exp-destination" placeholder="Ex : Saint-Ghislain" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="exp-type-marchandise"><i class="fa-solid fa-boxes-stacked"></i> Type de marchandise</label>
+                        <select id="exp-type-marchandise">
+                            <option value="Palette">Palette</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer-actions">
+                        <button type="button" class="btn-primary" onclick="goToExpressStep(2)">
+                            Suivant <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2 : Capacités par arrêt -->
+                <div id="exp-step-2" class="modal-body">
+                    <div class="section-title-dim">Capacités disponibles par arrêt</div>
+                    <div id="exp-capacites-par-etape"></div>
+                    <div id="exp-arrets-nav"></div>
+                </div>
+
+                <!-- STEP 3 : Tarification -->
+                <div id="exp-step-3" class="modal-body">
+                    <div class="section-title-dim">Tarification du trajet</div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-calendar-day"></i> Date du trajet</label>
+                        <input type="date" id="exp-date-trajet" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-hourglass-end"></i> Expiration de l'offre</label>
+                        <div class="form-row" style="gap:10px;">
+                            <input type="date" id="exp-expire-date" required>
+                            <input type="time" id="exp-expire-heure" required>
+                        </div>
+                        <p style="margin-top:8px; font-size:0.82rem; color:var(--text-muted); background:var(--bg-subtle); padding:8px 12px; border-radius:8px;">
+                            <i class="fa-solid fa-circle-info" style="color:var(--accent);"></i>
+                            L'offre sera automatiquement retirée du réseau passé ce délai.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-tag"></i> Tarif pour l'ensemble du trajet</label>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <input type="number" id="exp-tarif-euro-m3-km" step="0.01" min="0" placeholder="Ex : 2.50" style="flex:1;">
+                            <span style="font-weight:700; color:var(--text-muted); white-space:nowrap; font-size:0.95rem;">€ / km</span>
+                        </div>
+                        <p style="margin-top:10px; font-size:0.82rem; color:var(--text-muted); background:var(--bg-app); padding:10px 14px; border-radius:8px; line-height:1.6;">
+                            <i class="fa-solid fa-circle-info" style="color:var(--accent-blue);"></i>
+                            Ce tarif est appliqué par kilomètre parcouru entre les arrêts du client.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer-actions">
+                        <button type="button" class="btn-secondary" onclick="goToExpressStep(2)">Retour</button>
+                        <button type="button" class="btn-primary btn-success" onclick="soumettreOffreExpress()">
+                            <i class="fa-solid fa-paper-plane"></i> Publier l'offre
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-body active" style="text-align: center; padding: 40px 24px;">
+                <div style="background: #fee2e2; color: #ef4444; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 1.5rem;">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                
+                <h3 style="margin-bottom: 8px; color: #0f172a;">Supprimer cette offre ?</h3>
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 32px;">
+                    Cette action est irréversible. L'offre sera définitivement retirée du réseau Mercurus.
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <button onclick="closeDeleteModal()" style="background: #f1f5f9; color: #475569; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        Annuler
+                    </button>
+                    <button id="confirmDeleteBtn" style="background: #ef4444; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                        Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 650px;">
+
+            <header class="modal-header">
+                <div class="header-main">
+                    <h3><i class="fa-solid fa-pen-to-square"></i> Modifier l'offre</h3>
+                    <div class="stepper-indicator">
+                        <div id="edit-dot-1" class="step-dot active">1</div>
+                        <div class="step-line"></div>
+                        <div id="edit-dot-2" class="step-dot">2</div>
+                        <div class="step-line"></div>
+                        <div id="edit-dot-3" class="step-dot">3</div>
+                        <div class="step-line"></div>
+                        <div id="edit-dot-4" class="step-dot">4</div>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+            </header>
+
+            <form id="form-edit-offre">
+
+                <div id="modal-error-msg" class="modal-error-inline" style="display: none;"></div>
+
+                <!-- STEP 1 : Véhicule + Circuit + Type -->
+                <div id="edit-step-1" class="modal-body active">
+                    <div class="section-title-dim">Configuration du transport</div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-truck-front"></i> Véhicule assigné</label>
+                        <select id="edit-camion" required onchange="updateMaxIndicatorsEdit()">
+                            <option value="">-- Sélectionner un véhicule --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-route"></i> Circuit préconfiguré</label>
+                        <select id="edit-cycle" required>
+                            <option value="">-- Choisir un itinéraire --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-boxes-stacked"></i> Type de marchandise</label>
+                        <select id="edit-type-marchandise">
+                            <option value="Palette">Palette</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer-actions">
+                        <button type="button" class="btn-primary" onclick="goToEditStep(2)">
+                            Suivant <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2 : Capacités dynamiques par arrêt -->
+                <div id="edit-step-2" class="modal-body">
+                    <div class="section-title-dim">Capacités disponibles par arrêt</div>
+
+                    <div id="edit-capacites-par-etape">
+                        <!-- Généré par buildEditCapacitesForm() -->
+                    </div>
+
+                    <div id="edit-arrets-nav">
+                        <!-- Généré par rafraichirEditNavArrets() -->
+                    </div>
+                </div>
+
+                <!-- STEP 3 : Tarification -->
+                <div id="edit-step-3" class="modal-body">
+                    <div class="section-title-dim">Tarification du trajet</div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-calendar-day"></i> Date du trajet</label>
+                        <input type="date" id="edit-date-trajet" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-hourglass-end"></i> Expiration de l'offre</label>
+                        <div class="form-row" style="gap: 10px;">
+                            <input type="date" id="edit-expire-date" required>
+                            <input type="time" id="edit-expire-heure" required>
+                        </div>
+                        <p style="margin-top: 8px; font-size: 0.82rem; color: var(--text-muted); background: var(--bg-subtle); padding: 8px 12px; border-radius: 8px;">
+                            <i class="fa-solid fa-circle-info" style="color: var(--accent);"></i>
+                            L'offre sera automatiquement retirée du réseau passé ce délai.
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-tag"></i> Tarif pour l'ensemble du trajet</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="number" id="edit-tarif-euro-m3-km" step="0.01" min="0" placeholder="Ex : 2.50" style="flex: 1;">
+                            <span style="font-weight: 700; color: var(--text-muted); white-space: nowrap; font-size: 0.95rem;">€ / km</span>
+                        </div>
+                        <p style="margin-top: 10px; font-size: 0.82rem; color: var(--text-muted); background: var(--bg-app); padding: 10px 14px; border-radius: 8px; line-height: 1.6;">
+                            <i class="fa-solid fa-circle-info" style="color: var(--accent-blue);"></i>
+                            Ce tarif est appliqué par kilomètre parcouru entre les arrêts du client. Le prix final est calculé automatiquement en fonction de la distance du trajet sélectionné.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer-actions">
+                        <button type="button" class="btn-secondary" onclick="goToEditStep(2)">Retour</button>
+                        <button type="button" class="btn-primary" onclick="goToEditStep(4)">
+                            Suivant <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 4 : Statut de publication -->
+                <div id="edit-step-4" class="modal-body">
+                    <div class="section-title-dim">Visibilité de l'offre</div>
+
+                    <div class="status-options">
+                        <label class="status-option">
+                            <input type="radio" name="edit-offre-status" value="Brouillon">
+                            <div class="status-desc">
+                                <strong>Brouillon</strong>
+                                <span>L'offre n'est pas visible par les clients.</span>
+                            </div>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="edit-offre-status" value="Planifiée">
+                            <div class="status-desc">
+                                <strong>Planifiée</strong>
+                                <span>L'offre est en ligne et réservable.</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="modal-footer-actions">
+                        <button type="button" class="btn-secondary" onclick="goToEditStep(3)">Retour</button>
+                        <button type="button" class="btn-primary btn-success" onclick="sauvegarderModificationOffre()">
+                            <i class="fa-solid fa-check"></i> Enregistrer
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    <script src="/static/js/app/gestion/ville-autocomplete.js"></script>
+    <script src="/static/js/app/gestion/offres-logic.js" defer></script>
+    <script src="/static/js/app/gestion/creation.js"></script>
+    <script src="/static/js/app/gestion/modals.js"></script>
+</body>
+</html>

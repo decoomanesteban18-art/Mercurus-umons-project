@@ -1,0 +1,92 @@
+.top-bar {
+    height: 70px; /* Taille exacte de mes-transports */
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px; /* Padding standardisé */
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0; 
+    z-index: 100;
+}
+
+/* Barre de recherche */
+.search-wrapper {
+    position: relative;
+    width: 400px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.search-wrapper input {
+    width: 100%;
+    padding: 10px 15px 10px 45px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: #f8fafc;
+    outline: none;
+    transition: var(--transition);
+}
+
+.search-wrapper input:focus {
+    border-color: var(--secondary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Profil et Notifications */
+.user-nav {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.notification-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background: #e74c3c;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 1px solid var(--border-color);
+    padding-left: 20px;
+}
+
+.user-info {
+    text-align: right;
+}
+
+.user-name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary);
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}

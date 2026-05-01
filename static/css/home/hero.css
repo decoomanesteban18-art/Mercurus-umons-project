@@ -1,0 +1,32 @@
+.hero-section {
+    background: linear-gradient(135deg, var(--gray-bg), var(--white));
+    padding: 120px 0;
+    text-align: center;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-bottom: 24px;
+    line-height: 1.2;
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    margin-bottom: 40px;
+}
+
+.btn-primary {
+    display: inline-block;
+    text-decoration: none;
+    padding: 16px 40px;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 6px rgba(24, 72, 93, 0.2);
+}

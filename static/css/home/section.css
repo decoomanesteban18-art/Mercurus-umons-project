@@ -1,0 +1,117 @@
+.section-expertise {
+    background-color: var(--white);
+    padding: 100px 0;
+}
+
+.expertise-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+    flex-wrap: wrap;
+}
+
+.expertise-text {
+    flex: 1.2;
+    min-width: 320px;
+}
+
+.pre-title {
+    display: block;
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 15px;
+}
+
+.expertise-text h2 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 25px;
+}
+
+.expertise-text p {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+/* Grille des caractéristiques */
+.expertise-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.feat-item strong {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.feat-item p {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+/* Bloc Statistiques */
+.expertise-stats {
+    flex: 0.8;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    min-width: 300px;
+}
+
+.stat-card {
+    background: var(--gray-bg);
+    padding: 35px 20px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Mise en avant de la première stat (98%) */
+.stat-card:first-child {
+    grid-column: span 2;
+    background: linear-gradient(to bottom right, var(--white), var(--gray-bg));
+    border: 2px solid var(--secondary-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    background: var(--white);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+}
+
+.stat-number {
+    display: block;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--secondary-color);
+    line-height: 1;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    margin-top: 10px;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 992px) {
+    .expertise-flex { flex-direction: column; text-align: center; }
+    .expertise-features { text-align: left; }
+}
+

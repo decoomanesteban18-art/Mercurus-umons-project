@@ -1,0 +1,35 @@
+@media (max-width: 900px) {
+    .expertise-flex {
+        flex-direction: column;
+    }
+
+    .expertise-stats {
+        width: 100%;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .expertise-text h2 {
+        font-size: 2rem;
+    }
+
+    .expertise-features {
+        grid-template-columns: 1fr;
+    }
+}

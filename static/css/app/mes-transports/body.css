@@ -1,0 +1,105 @@
+/* ==========================================================================
+   body.css - GESTION DE LA FLOTTE (TRANSPORTS)
+   Style harmonisé sur le modèle des Cycles
+   ========================================================================== */
+
+@import "modals.css";
+@import "truck-info.css";
+
+:root {
+    --primary: #1e293b;
+    --secondary: #3b82f6;
+    --success: #22c55e;
+    --danger: #ef4444;
+    --border-color: #e2e8f0;
+    --bg-app: #f8fafc;
+    --white: #ffffff;
+    --radius: 12px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Couleurs Slate pour la cohérence */
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-600: #475569;
+}
+
+.inventory-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* --- CATEGORY CARD (Conteneur principal de la liste) --- */
+.category-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.card-header-top {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+}
+
+.under-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+}
+
+/* --- GRILLE DE CARTES (LIST-BULK) --- */
+/* On calque sur #cycle-list pour avoir les cartes côte à côte */
+.list-bulk {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding: 24px;
+    background-color: #fcfcfd; /* Fond légèrement différent pour faire ressortir les cartes */
+}
+
+/* --- BOUTON D'AJOUT PRINCIPAL --- */
+/* --- BOUTON CRÉER (GRAND ET BEAU) --- */
+
+/* On cible spécifiquement le bouton de création pour qu'il ne soit pas un petit carré de 40px */
+.btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--primary);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+/* --- ÉTATS VIDES --- */
+.no-data {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--slate-400);
+}
+
+.no-data i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: block;
+}

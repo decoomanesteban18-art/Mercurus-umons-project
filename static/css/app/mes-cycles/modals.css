@@ -1,0 +1,248 @@
+/* ==========================================================================
+   VARIABLES ET SYSTÈME DE DESIGN
+   ========================================================================== */
+:root {
+    --bg-main: #f8fafc;
+    --white: #ffffff;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --slate-900: #0f172a;
+    
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    
+    --red-500: #ef4444;
+    --red-600: #dc2626;
+    
+    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    --radius-lg: 12px;
+    --radius-full: 9999px;
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   OVERLAY ET STRUCTURE DU MODAL
+   ========================================================================== */
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal {
+    background: var(--white);
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--slate-200);
+    overflow: hidden;
+    animation: modalAppear 0.3s ease-out;
+}
+
+@keyframes modalAppear {
+    from { opacity: 0; transform: translateY(15px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--slate-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header .subtitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--slate-900);
+    margin: 0;
+}
+
+.close-btn {
+    font-size: 1.5rem;
+    color: var(--slate-400);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.close-btn:hover {
+    color: var(--red-500);
+    transform: rotate(90deg);
+}
+
+/* ==========================================================================
+   CHAMPS DE SAISIE ET VALIDATION
+   ========================================================================== */
+.modal-container { padding: 24px; }
+
+.attribute { margin-bottom: 18px; position: relative; }
+
+.attribute label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--slate-700);
+    margin-bottom: 8px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--slate-50);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius-lg);
+    font-size: 0.95rem;
+    color: var(--slate-900);
+    transition: var(--transition);
+}
+
+input[type="text"]:focus {
+    background: var(--white);
+    border-color: var(--blue-600);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+/* Grille 50/50 pour Départ/Destination */
+.dim {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+}
+
+/* --- MESSAGES D'ERREUR DYNAMIQUES --- */
+.error-toast {
+    color: var(--red-600);
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 5px;
+    position: absolute;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animation de secousse en cas d'erreur */
+.shake-animation {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    border-color: var(--red-500) !important;
+    background-color: #fff1f2 !important;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* ==========================================================================
+   TAGS (VILLES ÉTAPES)
+   ========================================================================== */
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.tag-etape {
+    background: var(--blue-600);
+    color: white;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+}
+
+.tag-etape i {
+    cursor: pointer;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.tag-etape i:hover {
+    opacity: 1;
+    color: var(--slate-900);
+}
+
+/* ==========================================================================
+   BOUTONS DE MODAL
+   ========================================================================== */
+.btn-primary {
+    width: 100%;
+    background: var(--blue-600);
+    color: white;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: var(--radius-lg);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-primary:hover {
+    background: var(--blue-700);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+/* Boutons suppression modal */
+.btn-erase-modal {
+    flex: 1;
+    background: var(--red-500);
+    color: white;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: var(--radius-lg);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-erase-modal:hover { background: var(--red-600); }
+
+.btn-erase-modal-none {
+    flex: 1;
+    background: var(--slate-100);
+    color: var(--slate-600);
+    font-weight: 600;
+    padding: 14px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--slate-200);
+    cursor: pointer;
+}
+
+.btn-erase-modal-none:hover { background: var(--slate-200); }

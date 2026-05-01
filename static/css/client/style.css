@@ -1,0 +1,33 @@
+@import "nav_bar.css";
+@import "footer.css";
+@import "expert.css";
+
+:root {
+    --primary-color: #18485d;    /* Bleu Royal Mercurus */
+    --secondary-color: #387189;  /* Bleu Clair Ailes */
+    --text-dark: #1f2937;
+    --text-light: #6b7280;
+    --white: #ffffff;
+    --gray-bg: #f3f4f6;
+    --border-color: #e5e7eb;
+    --radius: 30px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-dark);
+    line-height: 1.6;
+    background-color: var(--white);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}

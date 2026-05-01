@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="/static/js/app/auth-guard.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Transports | Mercurus</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/app/interface/style.css">
+    <link rel="stylesheet" href="/static/css/app/trouver-offres/body.css">
+</head>
+<body>
+    <div class="app-layout">
+        
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="/static/Images/Mercurus.png" alt="Mercurus" class="logo-img">
+            </div>
+            
+            <nav class="sidebar-menu">
+                <p class="menu-label">Menu Principal</p>
+                <a href="/dashboard" class="menu-link">
+                    <i class="fa-solid fa-chart-pie"></i> Tableau de bord
+                </a>
+                <a href="/mes-transports" class="menu-link">
+                    <i class="fa-solid fa-truck"></i> Gestion de la flotte
+                </a>
+                <a href="/mes-cycles" class="menu-link">
+                    <i class="fa-solid fa-route"></i> Mes trajets récents
+                </a>
+                <a href="/gestion" class="menu-link">
+                    <i class="fa-solid fa-folder-plus"></i> Console d'offres
+                </a>
+                <a href="/affichage-offres" class="menu-link active">
+                    <i class="fa-solid fa-magnifying-glass-location"></i> Trouvez une annonce
+                </a>
+                <a href="/gestion-demandes" class="menu-link">
+                    <i class="fa-solid fa-handshake"></i> Négociations
+                </a> 
+                <a href="/finances" class="menu-link">
+                    <i class="fa-solid fa-wallet"></i> Finances
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="/home" class="menu-link">
+                    <i class="fa-solid fa-rocket"></i> Découvrir Mercurus
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">         
+            <header class="top-bar">
+                <div class="page-header-text">
+                </div>
+                
+                <div class="user-nav">
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <span class="user-name" id="display-username">Chargement...</span>
+                            <span class="user-role" id="display-role">Utilisateur</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-scroll-area">
+                <div class="dashboard-body">
+                    <div class="welcome-section">
+                        <h1>Recherche</h1>
+                        <p class="subtitle">Trouvez une offre compatible et effectuez une demande</p>
+                    </div>
+
+                    <div class="inventory-container">
+                        <div class="category-card">
+                            <div class="card-header">
+                                <div class="header-main">
+                                    <h3 class="under-title">Offres disponibles</h3>
+                                </div>
+                            </div>
+                            
+                            <div class="list-container list-bulk" id="bulk-list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="modal-details" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-circle-info"></i> Détails de l'expédition</h2>
+                <button class="close-modal" onclick="fermerModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body-content"></div>
+            
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="fermerModal()">Fermer</button>
+                <button class="btn-primary" id="btn-demande-modal">Émettre une demande</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-form-demande" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-file-signature"></i> Finaliser votre demande</h2>
+                <button class="close-modal" onclick="fermerModalForm()">&times;</button>
+            </div>
+            
+            <form id="form-reservation">
+                <div class="modal-body">
+
+                    <h3 style="font-size: 0.9rem; color: #2563eb; margin-bottom: 10px; border-bottom: 1px solid #eee;">
+                        <i class="fa-solid fa-route"></i> Itinéraire
+                    </h3>
+
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label>Date du trajet</label>
+                        <input type="date" id="req-date-trajet" disabled
+                               style="background:#f8fafc; color:#64748b; cursor:not-allowed;">
+                    </div>
+
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-circle-dot" style="color:#2563eb;"></i> Arrêt de départ</label>
+                            <select id="req-arret-depart" required
+                                    style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.9rem;">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-location-dot" style="color:#ef4444;"></i> Arrêt d'arrivée</label>
+                            <select id="req-arret-arrivee" required
+                                    style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.9rem;">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="req-arret-error" style="display:none; margin-top: -10px; margin-bottom: 14px; padding: 8px 12px; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; font-size:0.82rem; color:#dc2626;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> L'arrêt de départ doit précéder l'arrêt d'arrivée.
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+
+                    <h3 style="font-size: 0.9rem; color: #475569; margin-bottom: 10px; border-bottom: 1px solid #eee;">
+                        <i class="fa-solid fa-box-open"></i> Dimensions & Tarif
+                    </h3>
+
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Poids (kg) <span id="max-poids" class="limit-tag" style="font-weight:bold;color:#2563eb;"></span></label>
+                            <input type="number" id="req-poids" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>Prix proposé (€)
+                                <span id="req-tarif-info" style="font-size:0.7rem;color:#64748b;font-weight:normal;margin-left:4px;"></span>
+                            </label>
+                            <input type="number" id="req-prix" min="0" step="0.01">
+                            <div style="margin-top:6px;font-size:0.78rem;color:#64748b;display:flex;align-items:center;gap:6px;">
+                                <i class="fa-solid fa-location-crosshairs" style="color:#2563eb;"></i>
+                                Distance : <span id="req-distance-info" style="font-weight:600;color:#475569;">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Long. <span id="max-long" style="font-size:0.7rem;color:#64748b;"></span></label>
+                            <input type="number" step="0.1" id="req-longueur" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Larg. <span id="max-larg" style="font-size:0.7rem;color:#64748b;"></span></label>
+                            <input type="number" step="0.1" id="req-largeur" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Haut. <span id="max-haut" style="font-size:0.7rem;color:#64748b;"></span></label>
+                            <input type="number" step="0.1" id="req-hauteur" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label><i class="fa-solid fa-comment-dots" style="color:#94a3b8;"></i> Commentaire <span style="font-weight:normal;color:#94a3b8;font-size:0.8rem;">(optionnel)</span></label>
+                        <textarea id="req-commentaire" rows="3" placeholder="Instructions particulières, accès, horaires préférés..."
+                                  style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.9rem;font-family:inherit;resize:vertical;transition:border-color 0.2s;"
+                                  onfocus="this.style.borderColor='#2563eb';this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)'"
+                                  onblur="this.style.borderColor='#cbd5e1';this.style.boxShadow='none'"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="fermerModalForm()">Annuler</button>
+                    <button type="submit" class="btn-primary">Confirmer l'envoi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="modal-success" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px; text-align: center; padding: 30px;">
+            <div style="color: #10b981; font-size: 4rem; margin-bottom: 20px;">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h2 style="margin-bottom: 10px;">Demande envoyée !</h2>
+            <p style="color: #64748b; margin-bottom: 25px;">Votre demande de fret a bien été transmise au transporteur.</p>
+            <button class="btn-primary" onclick="fermerModalSucces()" style="width: 100%;">Génial !</button>
+        </div>
+    </div>
+    <script src="/static/js/app/affichage-offres/trouver-fret.js"></script>
+</body>
+</html>

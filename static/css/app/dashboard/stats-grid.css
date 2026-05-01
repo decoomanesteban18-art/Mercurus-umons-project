@@ -1,0 +1,109 @@
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+/* 4. Cartes de statistiques individuelles */
+.stat-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0px 10px 30px rgba(163, 174, 208, 0.15); /* Ombre douce */
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 15px 35px rgba(163, 174, 208, 0.25);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.stat-label {
+    color: #a3aed0;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Indicateurs de tendance (ex: +12.5%) */
+.trend {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.trend.positive {
+    background-color: #e6faf5;
+    color: #05cd99;
+}
+
+/* Valeurs numériques */
+.stat-value {
+    color: #1b2559;
+    font-size: 32px;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+/* 5. Éléments spécifiques (Barre de progression, Icônes) */
+.progress-container {
+    background: #f4f7fe;
+    border-radius: 12px;
+    height: 12px;
+    width: 100%;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #4318ff 0%, #b4a3ff 100%);
+    height: 100%;
+    border-radius: 12px;
+    transition: width 1s ease-in-out;
+}
+
+.leaf-icon {
+    color: #05cd99;
+    font-size: 24px;
+    background: #f0fffb;
+    padding: 10px;
+    border-radius: 12px;
+}
+
+.stat-badge {
+    display: inline-block;
+    background: #f4f7fe;
+    color: #4318ff;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 15px;
+}
+
+/* 6. Section des offres / Tableaux */
+.data-section {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0px 10px 30px rgba(163, 174, 208, 0.1);
+}
+
+.data-section h2 {
+    color: #1b2559;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercurus - Accès</title>
+    <link rel="stylesheet" href="/static/css/login/login.css">
+    <link rel="stylesheet" href="/static/css/app/gestion/toast.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <img src="/static/Images/Mercurus.png" alt="Mercurus" class="logo-img">
+                <h1>MERCURUS</h1>
+                <p id="auth-subtitle">Gestion de flotte & Cycles</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="tab-btn active" id="tab-login">Connexion</button>
+                <button class="tab-btn" id="tab-register">Inscription</button>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <div class="input-group">
+                    <label>Utilisateur</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="username" placeholder="Identifiant" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Mot de passe</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Se connecter</button>
+            </form>
+
+            <form id="register-form" class="auth-form hidden">
+                <div class="input-group">
+                    <label>Identifiant de connexion</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-circle-user"></i>
+                        <input type="text" id="reg-username" placeholder="Ex: j.dupont" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Nom de l'entreprise</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-building"></i>
+                        <input type="text" id="reg-company" placeholder="Nom de votre société" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Adresse du siège</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <input type="text" id="reg-address" placeholder="Rue de l'Industrie, 10" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Email professionnel</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="reg-email" placeholder="contact@entreprise.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Téléphone</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-phone"></i>
+                        <input type="tel" id="reg-phone" placeholder="+32..." required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Mot de passe</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="password" id="reg-password" placeholder="Mot de passe" required>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Confirmer le mot de passe</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-check-double"></i>
+                        <input type="password" id="reg-confirm" placeholder="Confirmation" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Créer mon compte et ma flotte</button>
+            </form>
+
+            <p id="error-msg" class="error-msg"></p>
+        </div>
+    </div>
+    <script src="/static/js/login/login.js"></script>
+</body>
+</html>

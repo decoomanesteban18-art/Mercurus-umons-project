@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="/static/js/app/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Mercurus</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/static/css/app/interface/style.css">
+    <link rel="stylesheet" href="/static/css/app/dashboard/body.css">
+</head>
+<body>
+    <div class="app-layout">
+        
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="/static/Images/Mercurus.png" alt="Mercurus" class="logo-img">
+            </div>
+            
+            <nav class="sidebar-menu">
+                <p class="menu-label">Menu Principal</p>
+                <a href="/dashboard" class="menu-link active">
+                    <i class="fa-solid fa-chart-pie"></i> Tableau de bord
+                </a>
+                <a href="/mes-transports" class="menu-link">
+                    <i class="fa-solid fa-truck"></i> Gestion de la flotte
+                </a>
+                <a href="/mes-cycles" class="menu-link">
+                    <i class="fa-solid fa-route"></i> Mes trajets récents
+                </a>
+                <a href="/gestion" class="menu-link">
+                    <i class="fa-solid fa-folder-plus"></i> Console d'offres
+                </a>
+                <a href="/affichage-offres" class="menu-link">
+                    <i class="fa-solid fa-magnifying-glass-location"></i> Trouvez une annonce
+                </a>
+                <a href="/gestion-demandes" class="menu-link">
+                    <i class="fa-solid fa-handshake"></i> Négociations
+                </a> 
+                <a href="/finances" class="menu-link">
+                    <i class="fa-solid fa-wallet"></i> Finances
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="/home" class="menu-link">
+                    <i class="fa-solid fa-rocket"></i> Découvrir Mercurus
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">         
+            <header class="top-bar">
+                <div class="search-wrapper"></div>
+                <div class="user-nav">
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <span class="user-name" id="display-username">Chargement...</span>
+                            <span class="user-role" id="display-role">Utilisateur</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-scroll-area">
+                <div class="dashboard-body">
+
+                    <div class="welcome-section">
+                        <h1>Tableau de bord</h1>
+                        <p class="subtitle">Bienvenue, voici l'activité de vos flux pour la province du Hainaut.</p>
+                    </div>
+
+                    <div class="dashboard-columns">
+
+                        <!-- ══ PANNEAU GAUCHE : Mes offres + demandes reçues ══ -->
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div class="panel-icon blue">
+                                    <i class="fa-solid fa-truck"></i>
+                                </div>
+                                <h2>Mes offres émises</h2>
+                                <span class="panel-count" id="count-offres">0</span>
+                            </div>
+                            <div class="panel-body" id="offres-panel">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-truck-ramp-box"></i>
+                                    Chargement…
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ══ PANNEAU DROIT : Mes demandes envoyées ══ -->
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div class="panel-icon green">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </div>
+                                <h2>Mes demandes envoyées</h2>
+                                <span class="panel-count" id="count-demandes">0</span>
+                            </div>
+                            <div class="panel-body" id="demandes-panel">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    Chargement…
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/js/app/dashboard/dashboard.js"></script>
+</body>
+</html>

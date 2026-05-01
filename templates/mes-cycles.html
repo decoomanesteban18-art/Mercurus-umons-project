@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Cycles | Mercurus</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="/static/css/app/interface/style.css">
+    <link rel="stylesheet" href="/static/css/app/mes-cycles/body.css">
+    
+    <script src="/static/js/app/auth-guard.js"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="/static/Images/Mercurus.png" alt="Mercurus" class="logo-img">
+            </div>
+            
+            <nav class="sidebar-menu">
+                <p class="menu-label">Menu Principal</p>
+                <a href="/dashboard" class="menu-link">
+                    <i class="fa-solid fa-chart-pie"></i> Tableau de bord
+                </a>
+                <a href="/mes-transports" class="menu-link">
+                    <i class="fa-solid fa-truck"></i> Gestion de la flotte
+                </a>
+                <a href="/mes-cycles" class="menu-link active">
+                    <i class="fa-solid fa-route"></i> Mes trajets récents
+                </a>
+                <a href="/gestion" class="menu-link">
+                    <i class="fa-solid fa-folder-plus"></i> Console d'offres
+                </a>
+                <a href="/affichage-offres" class="menu-link">
+                    <i class="fa-solid fa-magnifying-glass-location"></i> Trouvez une annonce
+                </a>
+                <a href="/gestion-demandes" class="menu-link">
+                    <i class="fa-solid fa-handshake"></i> Négociations
+                </a> 
+                <a href="/finances" class="menu-link">
+                    <i class="fa-solid fa-wallet"></i> Finances
+                </a>
+                
+                <div class="menu-divider"></div>
+                
+                <a href="/home" class="menu-link">
+                    <i class="fa-solid fa-rocket"></i> Découvrir Mercurus
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="search-wrapper">
+
+                </div>
+                
+                <div class="user-nav">
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <span class="user-name" id="display-username">Chargement...</span>
+                            <span class="user-role" id="display-role">Utilisateur</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-scroll-area">
+                <div class="dashboard-body">
+                    <div class="welcome-section">
+                        <h1>Vos cycles enregistrés</h1>
+                        <p class="subtitle">Gérez vos itinéraires réguliers pour optimiser vos flux logistiques.</p>
+                    </div>
+
+                    <div class="inventory-container">
+                        <div class="category-card">
+                            <div class="card-header-top">
+                                <div class="header-main">
+                                    <h3 class="under-title">Trajets enregistrés</h3>
+                                </div>
+                                <div class="button-group-create">
+                                    <button class="btn-create" onclick="toggleModal('modal-ajout-cycle', true)">
+                                        <i class="fa-solid fa-plus"></i>
+                                        Nouveau trajet
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="cycle-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-ajout-cycle" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h1 class="subtitle"><i class="fa-solid fa-circle-plus"></i> Nouveau cycle</h1>
+                <button class="close-btn" onclick="toggleModal('modal-ajout-cycle', false)">&times;</button>
+            </div>
+            <div class="modal-container">
+                <form id="form-ajout-cycle" onsubmit="event.preventDefault(); validerAjoutCycle();">
+                    <div class="attribute">
+                        <label for="nom-cycle">Nom du cycle</label>
+                        <input type="text" id="nom-cycle" required placeholder="Ex: Navette Mons - Lille">
+                    </div>
+                    
+                    <div class="dim">
+                        <div class="field">
+                            <label for="depart-cycle">Départ</label>
+                            <input type="text" id="depart-cycle" list="villes-autorisees" required placeholder="Ville de départ">
+                        </div>
+                        <div class="field">
+                            <label for="dest-cycle">Destination</label>
+                            <input type="text" id="dest-cycle" list="villes-autorisees" required placeholder="Ville d'arrivée">
+                        </div>
+                    </div>
+
+                    <div class="attribute">
+                        <label>Villes étapes (facultatif)</label>
+                        <div class="input-with-button" style="display: flex; gap: 8px;">
+                            <input type="text" id="input-etape" list="villes-autorisees" placeholder="Ajouter une ville étape...">
+                            <button type="button" class="btn-primary" style="width: auto; padding: 0 15px;" onclick="ajouterEtape('input-etape', 'liste-etapes-visuelle')">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                        <div id="liste-etapes-visuelle" class="tags-container"></div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="margin-top: 20px;">
+                        Créer le cycle
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-details-cycle" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h1 class="subtitle"><i class="fa-solid fa-map-location-dot"></i> Détails de l'itinéraire</h1>
+                <button class="close-btn" onclick="toggleModal('modal-details-cycle', false)">&times;</button>
+            </div>
+            <div class="modal-container">
+                <h2 id="det-nom-cycle" style="margin-bottom: 20px; color: var(--slate-800);"></h2>
+                <div class="timeline">
+                    <div id="det-etapes-container"></div>
+                </div>
+                <button class="btn-primary" onclick="toggleModal('modal-details-cycle', false)">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-cycle" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h1 class="subtitle"><i class="fa-solid fa-pen-to-square"></i> Modifier le cycle</h1>
+                <button class="close-btn" onclick="toggleModal('modal-edit-cycle', false)">&times;</button>
+            </div>
+            <div class="modal-container">
+                <div class="attribute">
+                    <label>Nom du cycle</label>
+                    <input type="text" id="edit-nom-cycle">
+                </div>
+                <div class="dim">
+                    <div class="field">
+                        <label>Départ</label>
+                        <input type="text" id="edit-depart-cycle" list="villes-autorisees">
+                    </div>
+                    <div class="field">
+                        <label>Destination</label>
+                        <input type="text" id="edit-dest-cycle" list="villes-autorisees">
+                    </div>
+                </div>
+                <div class="attribute">
+                    <label>Ajouter une étape</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="edit-input-etape" list="villes-autorisees">
+                        <button type="button" class="btn-primary" style="width: auto; padding: 0 15px;" onclick="ajouterEtape('edit-input-etape', 'edit-liste-etapes-visuelle', true)">+</button>
+                    </div>
+                    <div id="edit-liste-etapes-visuelle" class="tags-container"></div>
+                </div>
+                <button class="btn-primary" onclick="sauvegarderModifCycle()" style="margin-top: 20px;">Enregistrer les modifications</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-suppression-cycle" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h1 class="subtitle" style="color: var(--red-500);">Confirmer la suppression</h1>
+            </div>
+            <div class="modal-container" style="text-align: center;">
+                <p>Êtes-vous sûr de vouloir supprimer définitivement ce cycle ?</p>
+                <h4 id="suppr-nom-cycle" style="margin: 20px 0; font-size: 1.2rem; color: var(--slate-900);"></h4>
+                <p class="subtitle" style="font-size: 0.8rem; margin-bottom: 25px;">Cette action est irréversible.</p>
+                
+                <div class="button-group">
+                    <button class="btn-erase-modal-none" onclick="toggleModal('modal-suppression-cycle', false)">Annuler</button>
+                    <button id="btn-confirmer-suppression" class="btn-erase-modal" onclick="confirmerSuppression()">Supprimer le cycle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <datalist id="villes-autorisees">
+        <option value="Mons">
+        <option value="Charleroi">
+        <option value="Ath">
+        <option value="Tournai">
+        <option value="Soignies">
+        <option value="La Louvière">
+        <option value="Binche">
+        <option value="Saint-Ghislain">
+        <option value="Péruwelz">
+        <option value="Braine-le-Comte">
+        <option value="Mouscron">
+        <option value="Comines-Warneton">
+        <option value="Lessines">
+        <option value="Châtelet">
+        <option value="Fleurus">
+    </datalist>
+
+    <script src="/static/js/app/mes-cycles/add-modal.js" defer></script>
+    <script src="/static/js/app/mes-cycles/extraction-cycles.js" defer></script>
+</body>
+</html>

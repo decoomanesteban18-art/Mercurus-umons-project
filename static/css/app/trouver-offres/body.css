@@ -1,0 +1,55 @@
+@import "offres.css";
+@import "modals.css";
+
+/* --- STRUCTURE ET MISE EN PAGE --- */
+.dashboard-body {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+/* --- CONTENEUR DE LA LISTE --- */
+.inventory-container {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    background: #f8fafc;
+}
+
+.under-title {
+    font-size: 1.1rem;
+    color: #334155;
+    font-weight: 600;
+}
+
+#bulk-list {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* États globaux (Chargement et Vide) */
+.loader {
+    text-align: center;
+    padding: 40px;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.no-data {
+    text-align: center;
+    padding: 48px;
+    color: #94a3b8;
+}

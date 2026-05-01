@@ -1,0 +1,169 @@
+:root {
+    --primary: #18485d;
+    --secondary: #387189;
+    --white: #ffffff;
+    --bg-light: #f3f4f6;
+    --error: #ef4444;
+    --radius-lg: 25px; /* Légèrement réduit pour un look plus moderne */
+    --radius-sm: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    min-height: 100vh; /* Utiliser min-height au lieu de height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Espace de sécurité pour mobile */
+}
+
+.login-box {
+    background: var(--white);
+    width: 100%;
+    max-width: 450px; /* Légèrement élargi pour mieux répartir les champs */
+    padding: 30px 40px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    text-align: center;
+    /* Gestion du débordement si l'écran est petit */
+    max-height: 95vh;
+    overflow-y: auto;
+}
+
+/* Scrollbar personnalisée pour la box si nécessaire */
+.login-box::-webkit-scrollbar { width: 5px; }
+.login-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+.logo-img { 
+    width: 80px; /* Taille optimisée */
+    height: auto;
+    margin-bottom: 10px; 
+}
+
+h1 { 
+    color: var(--primary); 
+    letter-spacing: 1px; 
+    margin-bottom: 5px; 
+    font-size: 1.8rem;
+}
+
+#auth-subtitle { 
+    color: #6b7280; 
+    font-size: 0.9rem; 
+    margin-bottom: 25px; 
+}
+
+/* Tabs */
+.auth-tabs {
+    display: flex;
+    background: var(--bg-light);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 25px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--secondary);
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.tab-btn.active {
+    background: var(--white);
+    color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Formulaires : Réduction des marges pour les formulaires longs */
+.input-group { 
+    text-align: left; 
+    margin-bottom: 15px; /* Réduit de 18px à 15px */
+}
+
+.input-group label { 
+    display: block; 
+    font-size: 0.8rem; 
+    font-weight: 700; 
+    color: var(--primary); 
+    margin-bottom: 4px; 
+    text-transform: uppercase; /* Donne un aspect plus "formulaire pro" */
+    letter-spacing: 0.5px;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 10px 12px 10px 42px; /* Hauteur réduite pour compenser le nombre de champs */
+    border: 1.5px solid #e5e7eb;
+    border-radius: var(--radius-sm);
+    background: var(--bg-light);
+    outline: none;
+    transition: 0.3s;
+    font-size: 0.95rem;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 15px;
+    color: var(--secondary);
+    font-size: 1rem;
+}
+
+/* Boutons */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 5px;
+}
+
+.btn-primary:hover { 
+    background: var(--secondary); 
+    transform: translateY(-2px); 
+    box-shadow: 0 5px 15px rgba(24, 72, 93, 0.3);
+}
+
+.btn-primary:active { transform: translateY(0); }
+
+/* Utilitaires */
+.hidden { display: none; }
+
+.error-msg { 
+    color: var(--error); 
+    font-size: 0.85rem; 
+    margin-top: 15px; 
+    min-height: 1.2em;
+    font-weight: 500;
+}
+
+/* Animation Shake améliorée */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+}
+
+/* Optimisation pour les petits écrans mobiles */
+@media (max-width: 480px) {
+    .login-box {
+        padding: 25px 20px;
+    }
+    h1 { font-size: 1.5rem; }
+}

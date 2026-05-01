@@ -1,0 +1,222 @@
+/* ==========================================================================
+   cycles-info.css - Système Global & Mise en Page des Cycles
+   ========================================================================== */
+
+/* --- STRUCTURE PRINCIPALE --- */
+.inventory-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.category-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+}
+
+.under-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+}
+
+/* --- GRILLE DE CARTES --- */
+#cycle-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding: 24px;
+    background-color: #fcfcfd;
+}
+
+/* --- CARTE INDIVIDUELLE --- */
+.cycle-item-card {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 220px;
+    transition: var(--transition);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.cycle-item-card:hover {
+    transform: translateY(-5px);
+}
+
+.cycle-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.cycle-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cycle-id {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.5px;
+}
+
+/* --- VISUEL DU TRAJET --- */
+.cycle-route-visual {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 10px;
+    background: #f8fafc;
+    border-radius: 12px;
+}
+
+.route-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.route-node i { color: var(--secondary); }
+.route-node.origin i { color: var(--success); }
+
+.route-connector {
+    flex-grow: 1;
+    height: 2px;
+    background: var(--border-color);
+    margin: 0 15px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.step-pill {
+    position: absolute;
+    top: -10px;
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+/* --- BOUTONS D'ACTION (FIXÉS) --- */
+.cycle-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.btn-cycle {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    border: none !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: var(--transition) !important;
+    font-size: 1.1rem !important;
+}
+
+/* 1. Bouton Voir */
+.btn-cycle.btn-view {
+    background-color: var(--slate-100);
+    color: var(--slate-600);
+}
+.btn-cycle.btn-view:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* 2. Bouton Modifier (Ton style Blue) */
+.btn-cycle.btn-settings {
+    background-color: var(--slate-100);
+    color: var(--slate-600);
+}
+.btn-cycle.btn-settings:hover {
+    background-color: var(--secondary); /* Blue */
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+/* 3. Bouton Supprimer (Ton style Red) */
+.btn-cycle.btn-delete {
+    background-color: #fff1f2; /* Soft Red */
+    color: var(--danger);
+}
+.btn-cycle.btn-delete:hover {
+    background-color: var(--danger); /* Red */
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);
+}
+
+/* --- TIMELINE (DÉTAILS) --- */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+    margin: 10px 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    border-left: 2px dashed var(--border-color);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+    font-size: 0.95rem;
+    color: var(--primary);
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -27px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    background: var(--white);
+    border: 2px solid var(--secondary);
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.timeline-item:first-child::before { border-color: var(--success); }
+.timeline-item:last-child::before { border-color: var(--danger); }
+.timeline-item:last-child { padding-bottom: 0; }

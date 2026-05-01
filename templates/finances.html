@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <script src="/static/js/app/auth-guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finances | Mercurus</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/app/interface/style.css">
+    <link rel="stylesheet" href="/static/css/app/finances/body.css">
+</head>
+<body>
+    <div class="app-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="/static/Images/Mercurus.png" alt="Mercurus" class="logo-img">
+            </div>
+            <nav class="sidebar-menu">
+                <p class="menu-label">Menu Principal</p>
+                <a href="/dashboard" class="menu-link">
+                    <i class="fa-solid fa-chart-pie"></i> Tableau de bord
+                </a>
+                <a href="/mes-transports" class="menu-link">
+                    <i class="fa-solid fa-truck"></i> Gestion de la flotte
+                </a>
+                <a href="/mes-cycles" class="menu-link">
+                    <i class="fa-solid fa-route"></i> Mes trajets récents
+                </a>
+                <a href="/gestion" class="menu-link">
+                    <i class="fa-solid fa-folder-plus"></i> Console d'offres
+                </a>
+                <a href="/affichage-offres" class="menu-link">
+                    <i class="fa-solid fa-magnifying-glass-location"></i> Trouvez une annonce
+                </a>
+                <a href="/gestion-demandes" class="menu-link">
+                    <i class="fa-solid fa-handshake"></i> Négociations
+                </a>
+                <a href="/finances" class="menu-link active">
+                    <i class="fa-solid fa-wallet"></i> Finances
+                </a>
+                <div class="menu-divider"></div>
+                <a href="/home" class="menu-link">
+                    <i class="fa-solid fa-rocket"></i> Découvrir Mercurus
+                </a>
+            </nav>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content">
+
+            <header class="top-bar">
+                <div class="search-wrapper"></div>
+                <div class="user-nav">
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <span class="user-name" id="display-username">Chargement...</span>
+                            <span class="user-role" id="display-role">Transporteur</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="finances-scroll-area">
+
+                <!-- TITRE -->
+                <div class="welcome-section">
+                    <h1>Vos finances</h1>
+                    <p class="subtitle">Suivi de vos gains et dépenses sur missions acceptées</p>
+                </div>
+
+                <!-- KPI CARDS -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon green"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                        <div class="kpi-info">
+                            <div class="kpi-label">Gains (transporteur)</div>
+                            <div class="kpi-value" id="kpi-gain">—</div>
+                            <div class="kpi-sub">demandes reçues acceptées</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon red"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                        <div class="kpi-info">
+                            <div class="kpi-label">Dépenses (expéditeur)</div>
+                            <div class="kpi-value" id="kpi-depense">—</div>
+                            <div class="kpi-sub">demandes envoyées acceptées</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon blue"><i class="fa-solid fa-scale-balanced"></i></div>
+                        <div class="kpi-info">
+                            <div class="kpi-label">Solde net</div>
+                            <div class="kpi-value" id="kpi-solde">—</div>
+                            <div class="kpi-sub">gains − dépenses</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon orange"><i class="fa-solid fa-road"></i></div>
+                        <div class="kpi-info">
+                            <div class="kpi-label">Distance transportée</div>
+                            <div class="kpi-value" id="kpi-distance">—</div>
+                            <div class="kpi-sub">kilomètres parcourus (gains)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLEAU -->
+                <div class="finances-table-card">
+                    <div class="table-card-header">
+                        <h3><i class="fa-solid fa-list-check" style="margin-right:8px; color:#3498db;"></i>Historique des missions</h3>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" onclick="filtrer('tous', this)">Toutes</button>
+                            <button class="filter-tab" onclick="filtrer('gains', this)">Gains</button>
+                            <button class="filter-tab" onclick="filtrer('depenses', this)">Dépenses</button>
+                        </div>
+                    </div>
+                    <table class="missions-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Référence</th>
+                                <th>Trajet</th>
+                                <th>Partenaire</th>
+                                <th>Date</th>
+                                <th>Distance</th>
+                                <th>Montant</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableau-body">
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== MODALE REMBOURSEMENT ===== -->
+    <div id="modale-remboursement" class="modale-overlay">
+        <div class="modale-box">
+            <div class="modale-header">
+                <div class="modale-icon-wrapper">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
+                <h2>Confirmer le remboursement</h2>
+                <button class="modale-close" onclick="fermerModale()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="modale-body">
+                <p class="modale-description">
+                    Vous êtes sur le point de rembourser la mission suivante. Cette action est <strong>irréversible</strong> :
+                    le montant sera restitué à l'expéditeur et les capacités de votre offre seront remises à jour.
+                </p>
+
+                <div class="modale-recap">
+                    <div class="recap-line">
+                        <span class="recap-label"><i class="fa-solid fa-hashtag"></i> Référence</span>
+                        <span class="recap-value" id="modale-id-demande">—</span>
+                    </div>
+                    <div class="recap-line">
+                        <span class="recap-label"><i class="fa-solid fa-user"></i> Expéditeur</span>
+                        <span class="recap-value" id="modale-expediteur">—</span>
+                    </div>
+                    <div class="recap-line">
+                        <span class="recap-label"><i class="fa-solid fa-euro-sign"></i> Montant remboursé</span>
+                        <span class="recap-value amount-negative" id="modale-montant">—</span>
+                    </div>
+                </div>
+
+                <p id="modale-erreur" class="modale-erreur"></p>
+            </div>
+
+            <div class="modale-footer">
+                <button class="btn-annuler" onclick="fermerModale()">
+                    <i class="fa-solid fa-xmark"></i> Annuler
+                </button>
+                <button class="btn-confirmer-remboursement" id="btn-confirmer-remboursement" onclick="confirmerRemboursement()">
+                    <i class="fa-solid fa-rotate-left"></i> Confirmer le remboursement
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app/finances/finances.js"></script>
+</body>
+</html>
