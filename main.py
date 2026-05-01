@@ -108,19 +108,20 @@ def sauvegarder_db(data):
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 # --- ROUTES DES PAGES HTML ---
+# Route pour l'accueil
 @app.get("/", response_class=HTMLResponse)
 @app.get("/login", response_class=HTMLResponse)
 async def read_login(request: Request):
-    # Utilisation explicite de name= et context=
-    return templates.TemplateResponse(name="login.html", context={"request": request})
+    # La nouvelle syntaxe : request en premier, puis le nom du fichier, puis le contexte
+    return templates.TemplateResponse(request, "login.html", {"request": request})
 
+# Route pour les autres pages
 @app.get("/{page}", response_class=HTMLResponse)
 async def read_any_page(request: Request, page: str):
     try:
-        # Utilisation explicite de name= et context=
-        return templates.TemplateResponse(name=f"{page}.html", context={"request": request})
+        return templates.TemplateResponse(request, f"{page}.html", {"request": request})
     except:
-        return templates.TemplateResponse(name="login.html", context={"request": request})
+        return templates.TemplateResponse(request, "login.html", {"request": request})
 # --- ROUTES API : AUTHENTIFICATION ---
 
 @app.post("/api/login")
