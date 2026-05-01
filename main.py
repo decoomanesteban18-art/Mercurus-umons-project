@@ -2,6 +2,7 @@ import time
 import math
 from fastapi import FastAPI, Body, Request, HTTPException
 from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -102,9 +103,12 @@ def sauvegarder_db(data):
         json.dump(data, f, indent=4, ensure_ascii=False)
 
 # --- ROUTES DES PAGES HTML ---
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    return FileResponse(os.path.join("static", "favicon.ico"))
 # 1. Route pour la racine
 @app.get("/", response_class=HTMLResponse)
-async def root(request: Request):
+async def read_root(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
 # 2. Route explicite pour login
@@ -115,10 +119,12 @@ async def read_login(request: Request):
 # 3. Route pour les autres pages (uniquement si elles existent)
 @app.get("/{page}", response_class=HTMLResponse)
 async def read_any_page(request: Request, page: str):
-    # Liste des pages valides pour éviter d'intercepter les fichiers statiques
-    if page in ["index", "dashboard", "register"]: # Ajoute tes noms de fichiers ici
+    # On vérifie si le fichier existe physiquement dans le dossier templates
+    path = os.path.join("templates", f"{page}.html")
+    if os.path.exists(path):
         return templates.TemplateResponse(f"{page}.html", {"request": request})
-    # Si la page n'est pas connue, on redirige vers login
+    
+    # Si la page n'existe pas, on renvoie vers login au lieu de crash
     return templates.TemplateResponse("login.html", {"request": request})
 # --- ROUTES API : AUTHENTIFICATION ---
 
