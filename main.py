@@ -9,11 +9,6 @@ from fastapi.responses import FileResponse, Response
 import json
 import os
 
-@app.get('/favicon.ico', include_in_schema=False)
-async def favicon():
-    # Au lieu de FileResponse, on renvoie une réponse vide 204 (No Content)
-    # Cela évite de chercher un fichier 'static/favicon.ico' qui n'existe pas
-    return Response(status_code=204)
 # ===========================================================================
 # MODULE GPS
 # ===========================================================================
@@ -75,6 +70,11 @@ def distance_troncon(villes_liste):
 # ===========================================================================
 
 app = FastAPI()
+
+@app.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    # Réponse vide 204 pour éviter de chercher un fichier inexistant
+    return Response(status_code=204)
 
 # --- CONFIGURATION DES DOSSIERS ---
 if not os.path.exists("static"):
