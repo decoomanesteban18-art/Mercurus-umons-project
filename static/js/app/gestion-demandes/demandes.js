@@ -348,8 +348,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const villes  = etapes.map(e => e.ville);
             const idxDep  = villes.indexOf(d.donnees.ville_depart);
             const idxArr  = villes.indexOf(d.donnees.ville_destination);
+            // On slice jusqu'à idxArr (exclusif) : on prend les contraintes des tronçons
+            // qui MÈNENT à la destination, pas celles de la destination elle-même
+            // (la marchandise y descend — les capacités sortantes ne nous concernent pas)
             const troncon = (idxDep >= 0 && idxArr > idxDep)
-                ? etapes.slice(idxDep, idxArr + 1)
+                ? etapes.slice(idxDep, idxArr)
                 : etapes;
 
             const minVal = (key) => troncon.length
@@ -444,6 +447,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (el) el.textContent = '';
             });
         }
+
+        // Les heures sont fixées par l'offre du transporteur — non modifiables
+        ['edit-heure-depart', 'edit-heure-arrivee'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = true;
+                el.style.background = '#f8fafc';
+                el.style.color      = '#94a3b8';
+                el.style.cursor     = 'not-allowed';
+            }
+        });
 
         const editIdInput = document.getElementById('edit-id');
         editIdInput.value        = d.donnees.id_demande || "";
