@@ -140,53 +140,109 @@
         </main>
     </div>
 
-    <!-- ===== MODALE REMBOURSEMENT ===== -->
-    <div id="modale-remboursement" class="modale-overlay">
+
+    <!-- =====================================================
+         MODALE 1 : DEMANDER UN REMBOURSEMENT
+         ===================================================== -->
+    <div id="modale-demande-remboursement" class="modale-overlay">
         <div class="modale-box">
             <div class="modale-header">
                 <div class="modale-icon-wrapper">
                     <i class="fa-solid fa-rotate-left"></i>
                 </div>
-                <h2>Confirmer le remboursement</h2>
-                <button class="modale-close" onclick="fermerModale()">
+                <h2>Demander un remboursement</h2>
+                <button class="modale-close" onclick="fermerModaleDemande()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
             <div class="modale-body">
                 <p class="modale-description">
-                    Vous êtes sur le point de rembourser la mission suivante. Cette action est <strong>irréversible</strong> :
-                    le montant sera restitué à l'expéditeur et les capacités de votre offre seront remises à jour.
+                    Vous allez envoyer une demande de remboursement à votre partenaire. 
+                    Le remboursement ne sera effectif qu'après son <strong>acceptation</strong>.
                 </p>
 
                 <div class="modale-recap">
                     <div class="recap-line">
                         <span class="recap-label"><i class="fa-solid fa-hashtag"></i> Référence</span>
-                        <span class="recap-value" id="modale-id-demande">—</span>
+                        <span class="recap-value" id="modale-demande-id">—</span>
                     </div>
                     <div class="recap-line">
-                        <span class="recap-label"><i class="fa-solid fa-user"></i> Expéditeur</span>
-                        <span class="recap-value" id="modale-expediteur">—</span>
+                        <span class="recap-label"><i class="fa-solid fa-user"></i> Partenaire</span>
+                        <span class="recap-value" id="modale-demande-partenaire">—</span>
                     </div>
                     <div class="recap-line">
-                        <span class="recap-label"><i class="fa-solid fa-euro-sign"></i> Montant remboursé</span>
-                        <span class="recap-value amount-negative" id="modale-montant">—</span>
+                        <span class="recap-label"><i class="fa-solid fa-euro-sign"></i> Montant concerné</span>
+                        <span class="recap-value" id="modale-demande-montant">—</span>
                     </div>
                 </div>
 
-                <p id="modale-erreur" class="modale-erreur"></p>
+                <p id="modale-demande-erreur" class="modale-erreur"></p>
             </div>
 
             <div class="modale-footer">
-                <button class="btn-annuler" onclick="fermerModale()">
+                <button class="btn-annuler" onclick="fermerModaleDemande()">
                     <i class="fa-solid fa-xmark"></i> Annuler
                 </button>
-                <button class="btn-confirmer-remboursement" id="btn-confirmer-remboursement" onclick="confirmerRemboursement()">
-                    <i class="fa-solid fa-rotate-left"></i> Confirmer le remboursement
+                <button class="btn-envoyer-demande" id="btn-confirmer-demande" onclick="confirmerDemandeRemboursement()">
+                    <i class="fa-solid fa-paper-plane"></i> Envoyer la demande
                 </button>
             </div>
         </div>
     </div>
+
+
+    <!-- =====================================================
+         MODALE 2 : RÉPONDRE À UNE DEMANDE (Accepter / Refuser)
+         ===================================================== -->
+    <div id="modale-reponse-remboursement" class="modale-overlay">
+        <div class="modale-box">
+            <div class="modale-header">
+                <!-- L'icône et le titre sont mis à jour dynamiquement selon l'action -->
+                <div id="modale-reponse-icon-wrapper" class="modale-icon-wrapper">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2 id="modale-reponse-titre">Répondre à la demande</h2>
+                <button class="modale-close" onclick="fermerModaleReponse()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="modale-body">
+                <p class="modale-description" id="modale-reponse-description">
+                    Votre partenaire a demandé un remboursement pour la mission ci-dessous.
+                </p>
+
+                <div class="modale-recap">
+                    <div class="recap-line">
+                        <span class="recap-label"><i class="fa-solid fa-hashtag"></i> Référence</span>
+                        <span class="recap-value" id="modale-reponse-id">—</span>
+                    </div>
+                    <div class="recap-line">
+                        <span class="recap-label"><i class="fa-solid fa-user"></i> Demandeur</span>
+                        <span class="recap-value" id="modale-reponse-partenaire">—</span>
+                    </div>
+                    <div class="recap-line">
+                        <span class="recap-label"><i class="fa-solid fa-euro-sign"></i> Montant</span>
+                        <span class="recap-value amount-negative" id="modale-reponse-montant">—</span>
+                    </div>
+                </div>
+
+                <p id="modale-reponse-erreur" class="modale-erreur"></p>
+            </div>
+
+            <div class="modale-footer">
+                <button class="btn-annuler" onclick="fermerModaleReponse()">
+                    <i class="fa-solid fa-arrow-left"></i> Retour
+                </button>
+                <!-- Le bouton change de style (vert / orange) selon l'action -->
+                <button id="btn-confirmer-reponse" onclick="confirmerReponseRemboursement()">
+                    <!-- contenu injecté dynamiquement -->
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <script src="/static/js/app/finances/finances.js"></script>
 </body>
