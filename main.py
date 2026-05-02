@@ -619,93 +619,217 @@ async def supprimer_demande_api(id_demande: str):
     sauvegarder_db(db)
     return {"status": "success", "message": "Demande supprimée avec succès"}
 
-# --- ROUTE REMBOURSEMENT ---
-@app.post("/api/demandes/rembourser/{id_demande}")
-async def rembourser_demande(id_demande: str, payload: dict = Body(...)):
+# ===========================================================================
+# REMBOURSEMENT BIDIRECTIONNEL
+# ===========================================================================
+
+STATUTS_REMB_EN_COURS = {
+    "Remboursement demandé par transporteur",
+    "Remboursement demandé par expéditeur",
+}
+
+def _trouver_demande_archivee(db, id_demande: str):
+    """Cherche la demande archivée dans TOUS les utilisateurs et retourne (demande, user_key)."""
+    for user_key, user_data in db.get("users", {}).items():
+        for archive in user_data.get("demandes_archivees", []):
+            if archive.get("donnees", {}).get("id_demande") == id_demande:
+                return archive, user_key
+    return None, None
+
+def _mettre_a_jour_statut_archives(db, id_demande: str, nouveau_statut: str):
+    """Met à jour le statut dans les archives de TOUS les utilisateurs concernés."""
+    for user_data in db.get("users", {}).values():
+        for archive in user_data.get("demandes_archivees", []):
+            if archive.get("donnees", {}).get("id_demande") == id_demande:
+                archive["donnees"]["statut"] = nouveau_statut
+
+def _restituer_capacites(db, demande_cible: dict):
+    """Restitue le poids et la longueur sur les étapes de l'offre du transporteur."""
+    transporteur_nom = demande_cible.get("transporteur")
+    id_offre_liee    = demande_cible.get("id_offre")
+    donnees          = demande_cible.get("donnees", {})
+    ville_dep        = donnees.get("ville_depart", "")
+    ville_arr        = donnees.get("ville_destination", "")
+    poids_dem        = float(donnees.get("poids_kg", 0) or 0)
+    long_dem         = float(donnees.get("longueur", 0) or 0)
+
+    if not (id_offre_liee and transporteur_nom and transporteur_nom in db.get("users", {})):
+        return
+
+    for offre in db["users"][transporteur_nom].get("mes_offres", []):
+        if offre.get("id") != id_offre_liee:
+            continue
+
+        etapes = offre.get("capacites_par_etape", [])
+        villes = [e.get("ville", "") for e in etapes]
+
+        idx_dep = villes.index(ville_dep) if ville_dep in villes else None
+        idx_arr = villes.index(ville_arr) if ville_arr in villes else None
+
+        if idx_dep is not None and idx_arr is not None:
+            snap             = offre.get("snapshot_camion", {})
+            long_max_camion  = float(snap.get("long",  snap.get("longueur",          0)) or 0)
+            poids_max_camion = float(snap.get("poids", snap.get("charge_maximale_kg", 0)) or 0)
+
+            for i, etape in enumerate(etapes):
+                if idx_dep <= i < idx_arr:
+                    etape["longueur"]          = round(min(long_max_camion,  float(etape.get("longueur",          0)) + long_dem),  4)
+                    etape["charge_disponible"] = round(min(poids_max_camion, float(etape.get("charge_disponible", 0)) + poids_dem), 4)
+
+        # Si toutes les demandes sur cette offre sont terminées → repasser en Planifiée
+        toutes_statuts = [
+            arch.get("donnees", {}).get("statut", "")
+            for u_data in db.get("users", {}).values()
+            for arch in u_data.get("demandes_archivees", [])
+            if arch.get("id_offre") == id_offre_liee and arch.get("transporteur") == transporteur_nom
+        ]
+        if all(s in ("Remboursée", "Refusée") for s in toutes_statuts):
+            offre["statut"] = "Planifiée"
+        break
+
+
+# --- ENDPOINT 1 : Initier une demande de remboursement (transporteur OU expéditeur) ---
+@app.post("/api/demandes/demander-remboursement/{id_demande}")
+async def demander_remboursement(id_demande: str, payload: dict = Body(...)):
     """
-    Rembourse une demande Acceptée :
-    1. Passe le statut en "Remboursée" dans les archives des deux utilisateurs
-    2. Restitue la longueur et le poids sur les étapes concernées de l'offre du transporteur
-    3. Crédite l'expéditeur (logique métier : le statut suffit, le front recalcule)
+    L'utilisateur (transporteur ou expéditeur) envoie une demande de remboursement.
+    Statut → "Remboursement demandé par transporteur" ou "Remboursement demandé par expéditeur"
     """
     db = charger_db()
 
-    username = payload.get("username")  # l'utilisateur qui initie (transporteur)
+    username = payload.get("username")
+    role     = payload.get("role")  # "transporteur" ou "expéditeur"
+
     if not username or username not in db.get("users", {}):
         raise HTTPException(status_code=403, detail="Utilisateur invalide")
 
-    # --- Trouver la demande dans les archives du transporteur ---
-    demande_cible = None
-    for archive in db["users"][username].get("demandes_archivees", []):
-        if archive.get("donnees", {}).get("id_demande") == id_demande:
-            demande_cible = archive
-            break
-
+    demande_cible, _ = _trouver_demande_archivee(db, id_demande)
     if not demande_cible:
         raise HTTPException(status_code=404, detail="Demande introuvable dans les archives")
 
-    if demande_cible["donnees"].get("statut") != "Acceptée":
-        raise HTTPException(status_code=400, detail="Seules les demandes Acceptées peuvent être remboursées")
+    statut_actuel = demande_cible["donnees"].get("statut")
+    if statut_actuel != "Acceptée":
+        raise HTTPException(status_code=400, detail="Seules les demandes Acceptées peuvent faire l'objet d'une demande de remboursement")
 
     transporteur_nom = demande_cible.get("transporteur")
     expediteur_nom   = demande_cible.get("expediteur")
-    id_offre_liee    = demande_cible.get("id_offre")
 
-    # Seul le transporteur peut initier le remboursement
-    if username != transporteur_nom:
-        raise HTTPException(status_code=403, detail="Seul le transporteur peut initier un remboursement")
+    if role == "transporteur":
+        if username != transporteur_nom:
+            raise HTTPException(status_code=403, detail="Vous n'êtes pas le transporteur de cette demande")
+        nouveau_statut = "Remboursement demandé par transporteur"
+    elif role == "expéditeur":
+        if username != expediteur_nom:
+            raise HTTPException(status_code=403, detail="Vous n'êtes pas l'expéditeur de cette demande")
+        nouveau_statut = "Remboursement demandé par expéditeur"
+    else:
+        raise HTTPException(status_code=400, detail="Rôle invalide (attendu : 'transporteur' ou 'expéditeur')")
 
-    donnees   = demande_cible.get("donnees", {})
-    ville_dep = donnees.get("ville_depart", "")
-    ville_arr = donnees.get("ville_destination", "")
-    poids_dem = float(donnees.get("poids_kg",  0) or 0)
-    long_dem  = float(donnees.get("longueur",  0) or 0)
+    _mettre_a_jour_statut_archives(db, id_demande, nouveau_statut)
+    sauvegarder_db(db)
+    return {"status": "success", "nouveau_statut": nouveau_statut}
 
-    # --- 1. Mise à jour statut dans les archives des deux utilisateurs ---
-    def _marquer_remboursee(nom_user):
-        if nom_user and nom_user in db.get("users", {}):
-            for archive in db["users"][nom_user].get("demandes_archivees", []):
-                if archive.get("donnees", {}).get("id_demande") == id_demande:
-                    archive["donnees"]["statut"] = "Remboursée"
-                    break
 
-    _marquer_remboursee(transporteur_nom)
-    if expediteur_nom != transporteur_nom:
-        _marquer_remboursee(expediteur_nom)
+# --- ENDPOINT 2 : Accepter la demande de remboursement ---
+@app.post("/api/demandes/accepter-remboursement/{id_demande}")
+async def accepter_remboursement(id_demande: str, payload: dict = Body(...)):
+    """
+    La partie adverse accepte le remboursement.
+    → Statut "Remboursée" + restitution des capacités de l'offre.
+    """
+    db = charger_db()
 
-    # --- 2. Restitution des capacités sur l'offre du transporteur ---
-    if id_offre_liee and transporteur_nom and transporteur_nom in db.get("users", {}):
-        for offre in db["users"][transporteur_nom].get("mes_offres", []):
-            if offre.get("id") == id_offre_liee:
-                etapes = offre.get("capacites_par_etape", [])
-                villes = [e.get("ville", "") for e in etapes]
+    username = payload.get("username")
+    if not username or username not in db.get("users", {}):
+        raise HTTPException(status_code=403, detail="Utilisateur invalide")
 
-                idx_dep = villes.index(ville_dep) if ville_dep in villes else None
-                idx_arr = villes.index(ville_arr) if ville_arr in villes else None
+    demande_cible, _ = _trouver_demande_archivee(db, id_demande)
+    if not demande_cible:
+        raise HTTPException(status_code=404, detail="Demande introuvable dans les archives")
 
-                if idx_dep is not None and idx_arr is not None:
-                    snap = offre.get("snapshot_camion", {})
-                    long_max_camion  = float(snap.get("long", snap.get("longueur", 0)) or 0)
-                    poids_max_camion = float(snap.get("poids", snap.get("charge_maximale_kg", 0)) or 0)
+    statut_actuel    = demande_cible["donnees"].get("statut")
+    transporteur_nom = demande_cible.get("transporteur")
+    expediteur_nom   = demande_cible.get("expediteur")
 
-                    # Tronçon occupé : départ inclus, destination exclue (même logique qu'à l'acceptation)
-                    for i, etape in enumerate(etapes):
-                        if idx_dep <= i < idx_arr:
-                            nouvelle_long  = min(long_max_camion,  float(etape.get("longueur", 0)) + long_dem)
-                            nouveau_poids  = min(poids_max_camion, float(etape.get("charge_disponible", 0)) + poids_dem)
-                            etape["longueur"]          = round(nouvelle_long, 4)
-                            etape["charge_disponible"] = round(nouveau_poids, 4)
+    if statut_actuel == "Remboursement demandé par transporteur":
+        # C'est l'expéditeur qui doit répondre
+        if username != expediteur_nom:
+            raise HTTPException(status_code=403, detail="Seul l'expéditeur peut accepter cette demande")
+    elif statut_actuel == "Remboursement demandé par expéditeur":
+        # C'est le transporteur qui doit répondre
+        if username != transporteur_nom:
+            raise HTTPException(status_code=403, detail="Seul le transporteur peut accepter cette demande")
+    else:
+        raise HTTPException(status_code=400, detail="Aucune demande de remboursement en cours sur cette mission")
 
-                # Si toutes les demandes sur cette offre sont remboursées/refusées, repasser en Planifiée
-                toutes_archivees = []
-                for u_data in db.get("users", {}).values():
-                    for arch in u_data.get("demandes_archivees", []):
-                        if arch.get("id_offre") == id_offre_liee and arch.get("transporteur") == transporteur_nom:
-                            toutes_archivees.append(arch.get("donnees", {}).get("statut", ""))
-                if all(s in ("Remboursée", "Refusée") for s in toutes_archivees):
-                    offre["statut"] = "Planifiée"
-                break
+    _mettre_a_jour_statut_archives(db, id_demande, "Remboursée")
+    _restituer_capacites(db, demande_cible)
+    sauvegarder_db(db)
+    return {"status": "success", "message": f"Demande {id_demande} remboursée avec succès"}
 
+
+# --- ENDPOINT 3 : Refuser la demande de remboursement ---
+@app.post("/api/demandes/refuser-remboursement/{id_demande}")
+async def refuser_remboursement(id_demande: str, payload: dict = Body(...)):
+    """
+    La partie adverse refuse le remboursement.
+    → Statut revient à "Acceptée" (aucune restitution de capacités).
+    """
+    db = charger_db()
+
+    username = payload.get("username")
+    if not username or username not in db.get("users", {}):
+        raise HTTPException(status_code=403, detail="Utilisateur invalide")
+
+    demande_cible, _ = _trouver_demande_archivee(db, id_demande)
+    if not demande_cible:
+        raise HTTPException(status_code=404, detail="Demande introuvable dans les archives")
+
+    statut_actuel    = demande_cible["donnees"].get("statut")
+    transporteur_nom = demande_cible.get("transporteur")
+    expediteur_nom   = demande_cible.get("expediteur")
+
+    if statut_actuel == "Remboursement demandé par transporteur":
+        if username != expediteur_nom:
+            raise HTTPException(status_code=403, detail="Seul l'expéditeur peut refuser cette demande")
+    elif statut_actuel == "Remboursement demandé par expéditeur":
+        if username != transporteur_nom:
+            raise HTTPException(status_code=403, detail="Seul le transporteur peut refuser cette demande")
+    else:
+        raise HTTPException(status_code=400, detail="Aucune demande de remboursement en cours sur cette mission")
+
+    _mettre_a_jour_statut_archives(db, id_demande, "Acceptée")
+    sauvegarder_db(db)
+    return {"status": "success", "message": "Demande de remboursement refusée. Statut remis à 'Acceptée'"}
+
+
+# --- ANCIEN ENDPOINT (conservé pour compatibilité, redirige vers le nouveau flux) ---
+@app.post("/api/demandes/rembourser/{id_demande}")
+async def rembourser_demande(id_demande: str, payload: dict = Body(...)):
+    """
+    Conservé pour compatibilité. Initie directement un remboursement côté transporteur
+    (ancien comportement, sans validation de l'autre partie).
+    Préférez /api/demandes/demander-remboursement/{id} pour le nouveau flux.
+    """
+    db = charger_db()
+
+    username = payload.get("username")
+    if not username or username not in db.get("users", {}):
+        raise HTTPException(status_code=403, detail="Utilisateur invalide")
+
+    demande_cible, _ = _trouver_demande_archivee(db, id_demande)
+    if not demande_cible:
+        raise HTTPException(status_code=404, detail="Demande introuvable dans les archives")
+
+    statut_actuel = demande_cible["donnees"].get("statut")
+    if statut_actuel != "Acceptée":
+        raise HTTPException(status_code=400, detail="Seules les demandes Acceptées peuvent être remboursées")
+
+    if username != demande_cible.get("transporteur"):
+        raise HTTPException(status_code=403, detail="Seul le transporteur peut utiliser cet endpoint")
+
+    _mettre_a_jour_statut_archives(db, id_demande, "Remboursée")
+    _restituer_capacites(db, demande_cible)
     sauvegarder_db(db)
     return {"status": "success", "message": f"Demande {id_demande} remboursée avec succès"}
 
