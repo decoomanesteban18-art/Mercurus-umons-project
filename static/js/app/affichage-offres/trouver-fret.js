@@ -119,18 +119,153 @@ async function chargerMarket() {
             off.statut === 'Publiée' || off.statut === 'Planifiée' || off.statut === 'Acceptée'
         );
 
-        if (marketCache.length === 0) {
-            listContainer.innerHTML = `<p class="empty-msg">Aucune offre disponible.</p>`;
-            return;
-        }
-
-        listContainer.innerHTML = '';
-        marketCache.forEach(off => listContainer.appendChild(creerLigneBandeAnnonce(off)));
+        injecterBarreRecherche();
+        appliquerFiltres();
 
     } catch (error) {
         listContainer.innerHTML = `<p class="error-msg">Erreur serveur.</p>`;
     }
 }
+
+/* --------------------------------------------------------------------------
+   BARRE DE RECHERCHE
+   -------------------------------------------------------------------------- */
+function injecterBarreRecherche() {
+    if (document.getElementById('search-bar-fret')) return;
+
+    const container = document.getElementById('search-bar-container');
+    if (!container) return;
+
+    const villes = [...new Set(
+        marketCache.flatMap(off => (off.capacites_par_etape || []).map(e => e.ville).filter(Boolean))
+    )].sort();
+
+    const types = [...new Set(
+        marketCache.map(off => off.type_marchandise).filter(Boolean)
+    )].sort();
+
+    const optVilles = villes.map(v => `<option value="${v}">${v}</option>`).join('');
+    const optTypes  = types.map(t => `<option value="${t}">${t}</option>`).join('');
+
+    const ss = 'width:100%;padding:9px 11px;border:1px solid #e2e8f0;border-radius:8px;font-size:0.88rem;color:#0f172a;background:#fff;font-family:inherit;outline:none;';
+
+    const barreHtml = `
+    <div id="search-bar-fret" style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <i class="fa-solid fa-sliders" style="color:#2563eb;"></i>
+            <span style="font-weight:700;font-size:0.95rem;color:#0f172a;">Filtrer les offres</span>
+            <span id="search-count" style="margin-left:auto;font-size:0.78rem;color:#64748b;font-weight:500;"></span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;">
+            <div>
+                <label style="display:block;font-size:0.75rem;font-weight:600;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">
+                    <i class="fa-solid fa-circle-dot" style="color:#2563eb;"></i> Départ
+                </label>
+                <select id="filter-depart" style="${ss}">
+                    <option value="">Toutes les villes</option>
+                    ${optVilles}
+                </select>
+            </div>
+            <div>
+                <label style="display:block;font-size:0.75rem;font-weight:600;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">
+                    <i class="fa-solid fa-location-dot" style="color:#ef4444;"></i> Arrivée
+                </label>
+                <select id="filter-arrivee" style="${ss}">
+                    <option value="">Toutes les villes</option>
+                    ${optVilles}
+                </select>
+            </div>
+            <div>
+                <label style="display:block;font-size:0.75rem;font-weight:600;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">
+                    <i class="fa-regular fa-calendar" style="color:#64748b;"></i> Date
+                </label>
+                <input type="date" id="filter-date" style="${ss}">
+            </div>
+            <div>
+                <label style="display:block;font-size:0.75rem;font-weight:600;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">
+                    <i class="fa-solid fa-box" style="color:#64748b;"></i> Type
+                </label>
+                <select id="filter-type" style="${ss}">
+                    <option value="">Tous les types</option>
+                    ${optTypes}
+                </select>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button onclick="appliquerFiltres()" style="padding:9px 18px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;white-space:nowrap;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                    <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+                </button>
+                <button onclick="reinitialiserFiltres()" title="Réinitialiser" style="padding:9px 11px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:0.88rem;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+            </div>
+        </div>
+    </div>`;
+
+    container.innerHTML = barreHtml;
+}
+
+/* --------------------------------------------------------------------------
+   FILTRAGE
+   -------------------------------------------------------------------------- */
+window.appliquerFiltres = function() {
+    const listContainer = document.getElementById('bulk-list');
+    if (!listContainer) return;
+
+    const filtDepart  = (document.getElementById('filter-depart')?.value || '').trim().toLowerCase();
+    const filtArrivee = (document.getElementById('filter-arrivee')?.value || '').trim().toLowerCase();
+    const filtDate    = document.getElementById('filter-date')?.value || '';
+    const filtType    = (document.getElementById('filter-type')?.value || '').trim().toLowerCase();
+
+    const resultats = marketCache.filter(off => {
+        const etapes = off.capacites_par_etape || [];
+        const villes = etapes.map(e => (e.ville || '').toLowerCase());
+
+        if (filtDepart && !villes.some(v => v.includes(filtDepart))) return false;
+
+        if (filtArrivee) {
+            const idxDep = filtDepart ? villes.findIndex(v => v.includes(filtDepart)) : 0;
+            const idxArr = villes.findIndex((v, i) => i > idxDep && v.includes(filtArrivee));
+            if (idxArr === -1) return false;
+        }
+
+        if (filtDate && off.date !== filtDate) return false;
+
+        if (filtType && (off.type_marchandise || '').toLowerCase() !== filtType) return false;
+
+        return true;
+    });
+
+    const countEl = document.getElementById('search-count');
+    if (countEl) {
+        const total = marketCache.length;
+        countEl.textContent = resultats.length === total
+            ? `${total} offre${total > 1 ? 's' : ''} disponible${total > 1 ? 's' : ''}`
+            : `${resultats.length} résultat${resultats.length > 1 ? 's' : ''} sur ${total}`;
+    }
+
+    if (resultats.length === 0) {
+        listContainer.innerHTML = `
+            <div style="text-align:center;padding:48px 20px;color:#64748b;">
+                <i class="fa-solid fa-magnifying-glass" style="font-size:2rem;margin-bottom:12px;display:block;color:#cbd5e1;"></i>
+                Aucune offre ne correspond à vos critères.<br>
+                <span style="font-size:0.82rem;">Essayez d'élargir votre recherche.</span>
+            </div>`;
+        return;
+    }
+
+    listContainer.innerHTML = '';
+    resultats.forEach(off => listContainer.appendChild(creerLigneBandeAnnonce(off)));
+};
+
+window.reinitialiserFiltres = function() {
+    ['filter-depart', 'filter-arrivee', 'filter-type'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    const dateEl = document.getElementById('filter-date');
+    if (dateEl) dateEl.value = '';
+    appliquerFiltres();
+};
 
 /* --------------------------------------------------------------------------
    CARTE MINI (LISTE)
