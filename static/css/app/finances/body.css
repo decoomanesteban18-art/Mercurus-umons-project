@@ -160,13 +160,21 @@
 .missions-table tbody tr:last-child td { border-bottom: none; }
 .missions-table tbody tr:hover { background: #fafbff; }
 
-/* Ligne remboursée : fond légèrement grisé */
+/* Ligne remboursée */
 .missions-table tbody tr.row-remboursee {
     background: #fafafa;
     opacity: 0.82;
 }
 .missions-table tbody tr.row-remboursee:hover { background: #f4f4f4; }
 
+/* Ligne avec remboursement demandé par l'autre partie → légère surbrillance orange */
+.missions-table tbody tr.row-attente-autre {
+    background: #fffbf0;
+    border-left: 3px solid #f39c12;
+}
+.missions-table tbody tr.row-attente-autre:hover { background: #fef6e4; }
+
+/* ===== BADGES ===== */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -177,9 +185,16 @@
     font-weight: 700;
     letter-spacing: 0.3px;
 }
-.badge.gain      { background: #eafaf1; color: #27ae60; }
-.badge.depense   { background: #fdf0f0; color: #e74c3c; }
-.badge.remboursee{ background: #f0f0f0; color: #718096; }
+.badge.gain           { background: #eafaf1; color: #27ae60; }
+.badge.depense        { background: #fdf0f0; color: #e74c3c; }
+.badge.remboursee     { background: #f0f0f0; color: #718096; }
+.badge.remb-attente   { background: #fef9ec; color: #b7791f; border: 1px solid #f6e05e; }
+.badge.remb-attente-autre { background: #fff3cd; color: #92400e; border: 1px solid #f59e0b; animation: pulse-badge 2s ease infinite; }
+
+@keyframes pulse-badge {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.3); }
+    50%       { box-shadow: 0 0 0 4px rgba(245,158,11,0); }
+}
 
 .ref-code {
     font-family: 'Courier New', monospace;
@@ -203,7 +218,6 @@
     padding: 1px 6px;
     margin-left: 6px;
     font-weight: 600;
-    text-decoration: none;
     vertical-align: middle;
 }
 
@@ -218,7 +232,7 @@
     font-size: 0.75rem;
 }
 
-/* ===== BOUTON REMBOURSER ===== */
+/* ===== BOUTON REMBOURSER (initiation) ===== */
 .btn-rembourser {
     display: inline-flex;
     align-items: center;
@@ -238,6 +252,70 @@
     background: #fdf0f0;
     border-color: #e74c3c;
     color: #e74c3c;
+}
+
+/* ===== GROUPE DE BOUTONS ACCEPTER / REFUSER ===== */
+.action-remb-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.btn-accepter-remb {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    border: 1px solid #a7f3d0;
+    background: #ecfdf5;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #059669;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+.btn-accepter-remb:hover {
+    background: #d1fae5;
+    border-color: #059669;
+    color: #047857;
+}
+
+.btn-refuser-remb {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    border: 1px solid #fecaca;
+    background: #fff5f5;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #dc2626;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+.btn-refuser-remb:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
+    color: #b91c1c;
+}
+
+/* ===== LABEL EN ATTENTE ===== */
+.badge-attente-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #b7791f;
+    background: #fef9ec;
+    border: 1px solid #f6e05e;
+    border-radius: 8px;
+    padding: 5px 10px;
+    white-space: nowrap;
 }
 
 /* ===== ÉTAT VIDE ===== */
@@ -264,7 +342,10 @@
 }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-/* ===== MODALE REMBOURSEMENT ===== */
+
+/* ==========================================================
+   MODALE 1 : DEMANDER UN REMBOURSEMENT
+   ========================================================== */
 .modale-overlay {
     display: none;
     position: fixed;
@@ -304,14 +385,19 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: #fdf0f0;
-    color: #e74c3c;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.1rem;
     flex-shrink: 0;
+    /* couleur par défaut (rouge) */
+    background: #fdf0f0;
+    color: #e74c3c;
+    transition: background 0.2s, color 0.2s;
 }
+.modale-icon-wrapper.green  { background: #eafaf1; color: #059669; }
+.modale-icon-wrapper.orange { background: #fff8ee; color: #d97706; }
+
 .modale-header h2 {
     font-size: 1.05rem;
     font-weight: 700;
@@ -405,11 +491,12 @@
 }
 .btn-annuler:hover { background: #f4f7fe; }
 
-.btn-confirmer-remboursement {
+/* Bouton envoyer demande (bleu) */
+.btn-envoyer-demande {
     padding: 9px 18px;
     border-radius: 10px;
     border: none;
-    background: #e74c3c;
+    background: #3b82f6;
     font-size: 0.85rem;
     font-weight: 600;
     color: #fff;
@@ -419,8 +506,44 @@
     align-items: center;
     gap: 6px;
 }
-.btn-confirmer-remboursement:hover:not(:disabled) { background: #c0392b; }
-.btn-confirmer-remboursement:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-envoyer-demande:hover:not(:disabled) { background: #2563eb; }
+.btn-envoyer-demande:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Bouton accepter (vert) */
+.btn-confirmer-accepter {
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: none;
+    background: #059669;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-confirmer-accepter:hover:not(:disabled) { background: #047857; }
+.btn-confirmer-accepter:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Bouton refuser (orange) */
+.btn-confirmer-refuser {
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: none;
+    background: #d97706;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-confirmer-refuser:hover:not(:disabled) { background: #b45309; }
+.btn-confirmer-refuser:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* ===== TOAST NOTIFICATION ===== */
 #toast-notification {
@@ -448,4 +571,5 @@
     transform: translateY(0);
 }
 #toast-notification.toast-success i { color: #2ecc71; }
-#toast-notification.toast-error i  { color: #e74c3c; }
+#toast-notification.toast-error i   { color: #e74c3c; }
+#toast-notification.toast-info i    { color: #3b82f6; }
