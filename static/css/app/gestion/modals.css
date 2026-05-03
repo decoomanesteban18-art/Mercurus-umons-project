@@ -71,6 +71,7 @@
     border              : 1px solid var(--modal-border);
     width               : 100%;
     max-width           : 560px;
+    max-height          : 90vh;
     display             : flex;
     flex-direction      : column;
     overflow            : hidden;
@@ -208,6 +209,7 @@
 
 .modal-body.active {
     display             : block;
+    overflow-y          : auto;
     animation           : bodyFadeIn 0.25s ease both;
 }
 
