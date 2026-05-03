@@ -1,5 +1,6 @@
 import time
 import math
+from datetime import datetime
 from fastapi import FastAPI, Body, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -106,6 +107,45 @@ def charger_db():
 def sauvegarder_db(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+
+# --- VÉRIFICATION EXPIRATION DES OFFRES ---
+def _verifier_expiration(off: dict) -> bool:
+    """
+    Vérifie et met à jour le statut d'une offre si elle a expiré.
+    Retourne True si le statut a été modifié.
+    """
+    statut = off.get("statut", "")
+    if statut not in ("Publiée", "Planifiée", "Acceptée"):
+        return False
+
+    now   = datetime.now()
+    today = now.date()
+
+    # 1. Date du trajet dépassée → Expirée
+    date_trajet = off.get("date")
+    if date_trajet:
+        try:
+            if datetime.strptime(date_trajet, "%Y-%m-%d").date() < today:
+                off["statut_avant"] = statut
+                off["statut"] = "Expirée"
+                return True
+        except ValueError:
+            pass
+
+    # 2. Délai de réservation dépassé → Fin de publication
+    expire_date = off.get("expire_date")
+    if expire_date:
+        expire_heure = off.get("expire_heure", "23:59") or "23:59"
+        try:
+            expire_dt = datetime.strptime(f"{expire_date} {expire_heure}", "%Y-%m-%d %H:%M")
+            if now > expire_dt:
+                off["statut_avant"] = statut
+                off["statut"] = "Fin de publication"
+                return True
+        except ValueError:
+            pass
+
+    return False
 
 # --- ROUTES DES PAGES HTML ---
 # Route pour l'accueil
@@ -290,7 +330,29 @@ async def delete_cycle(username: str, cycle_id: int):
 async def get_offres(username: str):
     db = charger_db()
     offres = db["users"].get(username, {}).get("mes_offres", [])
-    return sorted(offres, key=lambda x: x.get("id", 0), reverse=True)
+    modifie = any(_verifier_expiration(o) for o in offres)
+    if modifie:
+        sauvegarder_db(db)
+
+    # Compter les demandes acceptées par offre
+    toutes_demandes = db.get("demandes", [])
+    demandes_archivees = db["users"].get(username, {}).get("demandes_archivees", [])
+
+    def compter_acceptees(offre_id):
+        actives   = sum(1 for d in toutes_demandes
+                        if d.get("id_offre") == offre_id
+                        and d.get("transporteur") == username
+                        and d.get("donnees", {}).get("statut") == "Acceptée")
+        archivees = sum(1 for d in demandes_archivees
+                        if d.get("id_offre") == offre_id
+                        and d.get("donnees", {}).get("statut") == "Acceptée")
+        return actives + archivees
+
+    result = []
+    for o in sorted(offres, key=lambda x: x.get("id", 0), reverse=True):
+        o["nb_demandes_acceptees"] = compter_acceptees(o.get("id"))
+        result.append(o)
+    return result
 
 @app.get("/api/offres/{username}/{id}")
 async def get_offre_individuelle(username: str, id: int):
@@ -303,6 +365,8 @@ async def get_offre_individuelle(username: str, id: int):
     
     if not offre:
         raise HTTPException(status_code=404, detail="Offre introuvable")
+    if _verifier_expiration(offre):
+        sauvegarder_db(db)
     return offre
 
 @app.post("/api/offres/{username}")
@@ -360,11 +424,17 @@ async def delete_offre(username: str, id: int):
 async def get_market():
     db = charger_db()
     offres_publiques = []
+    db_modifiee = False
 
     for username, user_data in db.get("users", {}).items():
         for off in user_data.get("mes_offres", []):
             if off.get("statut") not in ["Publiée", "Planifiée", "Acceptée"]:
                 continue
+
+            # --- Vérification expiration ---
+            if _verifier_expiration(off):
+                db_modifiee = True
+                continue  # exclure du market si statut changé
 
             etapes = off.get("capacites_par_etape", [])
             premier = etapes[0]  if etapes else {}
@@ -399,9 +469,10 @@ async def get_market():
             }
             offres_publiques.append(market_item)
 
-    return offres_publiques
+    if db_modifiee:
+        sauvegarder_db(db)
 
-# --- ROUTE API : DEMANDES DE RÉSERVATION ---
+    return offres_publiques
 @app.post("/api/demandes/creer")
 async def creer_demande(payload: dict = Body(...)):
     db = charger_db()
