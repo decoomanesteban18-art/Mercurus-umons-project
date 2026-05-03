@@ -4,10 +4,12 @@
 
 // Configuration des statuts
 const STATUTS_CONFIG = {
-    'Publiée':  { class: 'status-publiee',    label: 'Publiée'  },
-    'Planifiée':{ class: 'status-plannifiee', label: 'À venir'  },
-    'Brouillon':{ class: 'status-brouillon',  label: 'Brouillon'},
-    'Acceptée': { class: 'status-acceptee',   label: 'Acceptée' }
+    'Publiée':           { class: 'status-publiee',          label: 'Publiée'           },
+    'Planifiée':         { class: 'status-plannifiee',       label: 'À venir'           },
+    'Brouillon':         { class: 'status-brouillon',        label: 'Brouillon'         },
+    'Acceptée':          { class: 'status-acceptee',         label: 'Acceptée'          },
+    'Fin de publication':{ class: 'status-fin-publication',  label: 'Fin de publication'},
+    'Expirée':           { class: 'status-expiree',          label: 'Expirée'           },
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -57,10 +59,8 @@ async function chargerOffres() {
 function renderOffreCard(offre) {
     const config = STATUTS_CONFIG[offre.statut] || STATUTS_CONFIG['Brouillon'];
 
-    // Verrouillage si l'offre est publiée OU acceptée (plus de modification possible)
-    const isLocked    = offre.statut === 'Publiée' || offre.statut === 'Acceptée';
-    const actionIcon  = isLocked ? 'fa-eye' : 'fa-pen-to-square';
-    const actionTitle = isLocked ? 'Voir les détails' : 'Modifier';
+    // Logique des boutons selon le statut
+    const statut = offre.statut;
 
     // Récupération des heures depuis capacites_par_etape
     const etapes    = offre.capacites_par_etape || [];
@@ -76,6 +76,22 @@ function renderOffreCard(offre) {
     // Ville départ / destination
     const villeDep = offre.depart      || premier.ville || '--';
     const villeArr = offre.destination || dernier.ville  || '--';
+
+    // Bouton principal
+    let actionBtn;
+    if (statut === 'Brouillon' || statut === 'Planifiée' || statut === 'Publiée') {
+        actionBtn = '<button class="btn-action btn-edit" onclick="openSettingsModal(' + offre.id + ')" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></button>';
+    } else if (statut === 'Fin de publication') {
+        actionBtn = '<button class="btn-renvoyer" onclick="renvoyerOffre(' + offre.id + ')" title="Renvoyer l\'offre"><i class="fa-solid fa-rotate-right"></i> Renvoyer</button>';
+    } else {
+        // Acceptée, Expirée
+        actionBtn = '<button class="btn-action btn-view" onclick="ouvrirDetailsOffre(' + offre.id + ')" title="Voir les détails"><i class="fa-solid fa-eye"></i></button>';
+    }
+
+    // Bouton supprimer : uniquement Brouillon et Expirée
+    const deleteBtn = (statut === 'Brouillon' || statut === 'Expirée')
+        ? '<div class="btn-divider"></div><button class="btn-action btn-delete" onclick="askDeleteOffre(' + offre.id + ')" title="Supprimer"><i class="fa-solid fa-trash-can"></i></button>'
+        : '';
 
     return `
         <div class="offre-item-card" data-id="${offre.id}">
@@ -115,24 +131,15 @@ function renderOffreCard(offre) {
                 </div>
             </div>
 
-            <div class="card-footer">
+            <div class="card-footer ${statut === 'Fin de publication' ? 'card-footer--expired' : ''}">
                 <div class="capacity-pill">
-                    <i class="fa-solid fa-weight-hanging"></i>
-                    <span><strong>${chargeDispo}</strong> kg dispos</span>
+                    <i class="fa-solid fa-handshake"></i>
+                    <span><strong>${offre.nb_demandes_acceptees ?? 0}</strong> demande${(offre.nb_demandes_acceptees ?? 0) !== 1 ? 's' : ''} acceptée${(offre.nb_demandes_acceptees ?? 0) !== 1 ? 's' : ''}</span>
                 </div>
 
                 <div class="action-group">
-                    <button class="btn-action ${isLocked ? 'btn-view' : 'btn-edit'}"
-                            onclick="openSettingsModal(${offre.id})"
-                            title="${actionTitle}">
-                        <i class="fa-solid ${actionIcon}"></i>
-                    </button>
-                    <div class="btn-divider"></div>
-                    <button class="btn-action btn-delete"
-                            onclick="askDeleteOffre(${offre.id})"
-                            title="Supprimer">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
+                    ${actionBtn}
+                    ${deleteBtn}
                 </div>
             </div>
         </div>
