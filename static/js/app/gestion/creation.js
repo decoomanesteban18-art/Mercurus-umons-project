@@ -411,8 +411,9 @@ async function openOffreModal() {
 
         const sTruck = document.getElementById('select-camion');
         if (sTruck) {
+            const camionsDispos = trucks.filter(t => t.statut === 'Disponible');
             sTruck.innerHTML = '<option value="">-- Sélectionner --</option>' +
-                trucks.map(t => `<option value="${t.immatriculation}">${t.immatriculation}</option>`).join('');
+                camionsDispos.map(t => `<option value="${t.immatriculation}">${t.immatriculation}</option>`).join('');
 
             sTruck.removeEventListener('change', captureSnapshotCamion);
             sTruck.addEventListener('change', captureSnapshotCamion);
@@ -570,8 +571,9 @@ async function openOffreExpressModal() {
 
         const sTruck = document.getElementById('exp-select-camion');
         if (sTruck) {
+            const camionsDispos = trucks.filter(t => t.statut === 'Disponible');
             sTruck.innerHTML = '<option value="">-- Sélectionner --</option>' +
-                trucks.map(t => `<option value="${t.immatriculation}">${t.immatriculation}</option>`).join('');
+                camionsDispos.map(t => `<option value="${t.immatriculation}">${t.immatriculation}</option>`).join('');
 
             sTruck.addEventListener('change', captureExpressSnapshotCamion);
         }
