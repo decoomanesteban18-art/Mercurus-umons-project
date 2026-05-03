@@ -71,11 +71,19 @@
     border              : 1px solid var(--modal-border);
     width               : 100%;
     max-width           : 560px;
-    max-height          : 90vh;
     display             : flex;
     flex-direction      : column;
     overflow            : hidden;
     animation           : modalEntry 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Modale détails — scroll si contenu trop grand */
+#detailsOffreModal .modal-content {
+    max-height          : 90vh;
+}
+
+#detailsOffreModal .modal-body {
+    overflow-y          : auto;
 }
 
 .settings-container {
@@ -209,7 +217,6 @@
 
 .modal-body.active {
     display             : block;
-    overflow-y          : auto;
     animation           : bodyFadeIn 0.25s ease both;
 }
 
