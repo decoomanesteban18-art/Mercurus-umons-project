@@ -1,926 +1,274 @@
-/* ==========================================================================
-   MERCURUS — SYSTÈME DE MODALES (modals.css)
-   ========================================================================== */
-
-:root {
-    --modal-overlay-bg  : rgba(10, 15, 30, 0.72);
-    --modal-bg          : #ffffff;
-    --modal-border      : #e8ecf2;
-
-    --primary           : #1e293b;
-    --primary-hover     : #0f172a;
-    --accent            : #3b82f6;
-    --accent-soft       : #eff6ff;
-    --accent-border     : #bfdbfe;
-
-    --success           : #10b981;
-    --success-soft      : #ecfdf5;
-    --danger            : #ef4444;
-    --danger-soft       : #fef2f2;
-    --danger-border     : #fecaca;
-    --warning-soft      : #fff7ed;
-    --warning-text      : #92400e;
-    --warning-border    : #fed7aa;
-
-    --text-main         : #1e293b;
-    --text-secondary    : #475569;
-    --text-muted        : #94a3b8;
-    --bg-subtle         : #f8fafc;
-    --bg-input          : #ffffff;
-    --border-light      : #f1f5f9;
-
-    --radius-sm         : 6px;
-    --radius-md         : 10px;
-    --radius-lg         : 14px;
-    --radius-xl         : 20px;
-
-    --shadow-modal      : 0 32px 64px -12px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0,0,0,0.04);
-    --shadow-sm         : 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-    --shadow-focus      : 0 0 0 3px rgba(59, 130, 246, 0.16);
-
-    --transition-fast   : 0.15s ease;
-    --transition-base   : 0.25s ease;
-}
-
-/* ==========================================================================
-   1. OVERLAY
-   ========================================================================== */
-
-.modal-overlay {
-    display             : none;
-    position            : fixed;
-    inset               : 0;
-    background          : var(--modal-overlay-bg);
-    backdrop-filter     : blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    z-index             : 9999;
-    justify-content     : center;
-    align-items         : center;
-    padding             : 16px;
-}
-
-/* ==========================================================================
-   2. CONTENEURS
-   ========================================================================== */
-
-.modal-content,
-.settings-container {
-    background          : var(--modal-bg);
-    border-radius       : var(--radius-xl);
-    box-shadow          : var(--shadow-modal);
-    border              : 1px solid var(--modal-border);
-    width               : 100%;
-    max-width           : 560px;
-    display             : flex;
-    flex-direction      : column;
-    overflow            : hidden;
-    animation           : modalEntry 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.settings-container {
-    max-width           : 920px;
-    flex-direction      : row;
-    height              : 86vh;
-    max-height          : 740px;
-}
-
-@keyframes modalEntry {
-    from {
-        opacity         : 0;
-        transform       : translateY(16px) scale(0.975);
-    }
-    to {
-        opacity         : 1;
-        transform       : translateY(0) scale(1);
-    }
-}
-
-/* ==========================================================================
-   3. HEADER & STEPPER
-   ========================================================================== */
-
-.modal-header {
-    padding             : 18px 24px;
-    background          : var(--bg-subtle);
-    border-bottom       : 1px solid var(--modal-border);
-    display             : flex;
-    justify-content     : space-between;
-    align-items         : center;
-    flex-shrink         : 0;
-}
-
-.header-main {
-    display             : flex;
-    align-items         : center;
-    gap                 : 18px;
-}
-
-.modal-header h2 {
-    margin              : 0;
-    font-size           : 1.05rem;
-    font-weight         : 700;
-    color               : var(--primary);
-    letter-spacing      : -0.01em;
-}
-
-.modal-header h3 {
-    margin              : 0;
-    font-size           : 1.05rem;
-    font-weight         : 700;
-    color               : var(--primary);
-    letter-spacing      : -0.01em;
-}
-
-/* --- Stepper --- */
-
-.stepper-indicator {
-    display             : flex;
-    align-items         : center;
-    gap                 : 6px;
-}
-
-.step-dot {
-    width               : 28px;
-    height              : 28px;
-    border-radius       : 50%;
-    background          : var(--bg-input);
-    color               : var(--text-muted);
-    display             : flex;
-    align-items         : center;
-    justify-content     : center;
-    font-size           : 0.72rem;
-    font-weight         : 800;
-    border              : 1.5px solid var(--modal-border);
-    transition          : all var(--transition-base);
-    user-select         : none;
-}
-
-.step-dot.active {
-    background          : var(--accent);
-    color               : #ffffff;
-    border-color        : var(--accent);
-    box-shadow          : 0 0 0 4px rgba(59, 130, 246, 0.12);
-}
-
-.step-line {
-    width               : 18px;
-    height              : 1.5px;
-    background          : var(--modal-border);
-    border-radius       : 1px;
-}
-
-/* --- Bouton fermeture --- */
-
-.close-btn {
-    width               : 32px;
-    height              : 32px;
-    border-radius       : var(--radius-sm);
-    border              : 1px solid var(--modal-border);
-    background          : var(--bg-input);
-    display             : flex;
-    align-items         : center;
-    justify-content     : center;
-    font-size           : 1.1rem;
-    line-height         : 1;
-    color               : var(--text-muted);
-    cursor              : pointer;
-    transition          : all var(--transition-fast);
-    flex-shrink         : 0;
-}
-
-.close-btn:hover {
-    background          : var(--danger-soft);
-    border-color        : var(--danger-border);
-    color               : var(--danger);
-}
-
-/* ==========================================================================
-   4. CORPS
-   ========================================================================== */
-
-.modal-body {
-    padding             : 28px 30px;
-    background          : var(--modal-bg);
-    overflow-y          : auto;
-    display             : none;
-    flex                : 1;
-}
-
-.modal-body.active {
-    display             : block;
-    animation           : bodyFadeIn 0.25s ease both;
-}
-
-@keyframes bodyFadeIn {
-    from {
-        opacity         : 0;
-        transform       : translateX(8px);
-    }
-    to {
-        opacity         : 1;
-        transform       : translateX(0);
-    }
-}
-
-/* Scrollbar discrète */
-.modal-body::-webkit-scrollbar { width: 4px; }
-.modal-body::-webkit-scrollbar-track { background: transparent; }
-.modal-body::-webkit-scrollbar-thumb { background: var(--modal-border); border-radius: 2px; }
-
-/* --- Titre de section --- */
-
-.section-title-dim {
-    display             : flex;
-    align-items         : center;
-    gap                 : 8px;
-    font-size           : 0.7rem;
-    font-weight         : 800;
-    color               : var(--text-secondary);
-    text-transform      : uppercase;
-    letter-spacing      : 0.08em;
-    margin-bottom       : 22px;
-}
-
-.section-title-dim::before {
-    content             : '';
-    display             : inline-block;
-    width               : 3px;
-    height              : 14px;
-    background          : var(--accent);
-    border-radius       : 2px;
-    flex-shrink         : 0;
-}
-
-/* ==========================================================================
-   5. FORMULAIRES
-   ========================================================================== */
-
-.form-group {
-    margin-bottom       : 18px;
-}
-
-.form-group:last-child {
-    margin-bottom       : 0;
-}
-
-.form-group label {
-    display             : block;
-    font-size           : 0.82rem;
-    font-weight         : 650;
-    color               : var(--text-secondary);
-    margin-bottom       : 7px;
-    letter-spacing      : 0.01em;
-}
-
-.form-group label i {
-    color               : var(--accent);
-    margin-right        : 5px;
-    font-size           : 0.8rem;
-}
-
-/* Champs */
-
-input,
-select,
-textarea {
-    width               : 100%;
-    padding             : 10px 13px;
-    border              : 1.5px solid var(--modal-border);
-    border-radius       : var(--radius-md);
-    font-size           : 0.92rem;
-    font-family         : inherit;
-    color               : var(--text-main);
-    background          : var(--bg-input);
-    transition          : border-color var(--transition-fast), box-shadow var(--transition-fast);
-    appearance          : none;
-    -webkit-appearance  : none;
-    box-sizing          : border-box;
-}
-
-input:hover,
-select:hover {
-    border-color        : #cbd5e1;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-    outline             : none;
-    border-color        : var(--accent);
-    box-shadow          : var(--shadow-focus);
-}
-
-select {
-    background-image    : url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat   : no-repeat;
-    background-position : right 12px center;
-    padding-right       : 34px;
-}
-
-/* États désactivés */
-
-input:disabled,
-select:disabled,
-textarea:disabled {
-    background          : var(--bg-subtle);
-    color               : var(--text-muted);
-    cursor              : not-allowed;
-    border-color        : var(--border-light);
-}
-
-/* Grilles */
-
-.form-row {
-    display             : grid;
-    grid-template-columns: 1fr 1fr;
-    gap                 : 14px;
-}
-
-.form-row-tri {
-    display             : grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap                 : 10px;
-}
-
-/* Indicateurs de limites */
-
-.info-max {
-    display             : inline-flex;
-    align-items         : center;
-    gap                 : 4px;
-    margin-top          : 5px;
-    font-size           : 0.72rem;
-    color               : var(--text-muted);
-    background          : var(--bg-subtle);
-    padding             : 3px 9px;
-    border-radius       : 99px;
-    border              : 1px solid var(--border-light);
-}
-
-.info-max span {
-    font-weight         : 700;
-    color               : var(--text-secondary);
-}
-
-/* ==========================================================================
-   6. FOOTER & BOUTONS
-   ========================================================================== */
-
-.modal-footer-actions {
-    padding             : 18px 30px;
-    background          : var(--bg-subtle);
-    border-top          : 1px solid var(--modal-border);
-    display             : flex;
-    justify-content     : flex-end;
-    align-items         : center;
-    gap                 : 10px;
-    flex-shrink         : 0;
-}
-
-/* Bouton principal */
-
-.btn-primary,
-.btn-submit {
-    display             : inline-flex;
-    align-items         : center;
-    gap                 : 7px;
-    padding             : 10px 20px;
-    background          : var(--primary);
-    color               : #ffffff;
-    border              : none;
-    border-radius       : var(--radius-md);
-    font-size           : 0.88rem;
-    font-weight         : 700;
-    font-family         : inherit;
-    cursor              : pointer;
-    transition          : all var(--transition-fast);
-    white-space         : nowrap;
-}
-
-.btn-primary:hover,
-.btn-submit:hover {
-    background          : var(--primary-hover);
-    transform           : translateY(-1px);
-    box-shadow          : 0 4px 12px rgba(15, 23, 42, 0.18);
-}
-
-.btn-primary:active,
-.btn-submit:active {
-    transform           : translateY(0);
-    box-shadow          : none;
-}
-
-/* Bouton secondaire */
-
-.btn-secondary {
-    display             : inline-flex;
-    align-items         : center;
-    gap                 : 7px;
-    padding             : 10px 18px;
-    background          : var(--bg-input);
-    color               : var(--text-secondary);
-    border              : 1.5px solid var(--modal-border);
-    border-radius       : var(--radius-md);
-    font-size           : 0.88rem;
-    font-weight         : 600;
-    font-family         : inherit;
-    cursor              : pointer;
-    transition          : all var(--transition-fast);
-    white-space         : nowrap;
-}
-
-.btn-secondary:hover {
-    background          : var(--bg-subtle);
-    border-color        : #cbd5e1;
-    color               : var(--text-main);
-}
-
-/* Modificateurs de couleur */
-
-.btn-success {
-    background          : var(--success) !important;
-    border-color        : transparent !important;
-    color               : #ffffff !important;
-}
-
-.btn-success:hover {
-    background          : #059669 !important;
-    box-shadow          : 0 4px 14px rgba(16, 185, 129, 0.25) !important;
-}
-
-.btn-danger {
-    background          : var(--danger) !important;
-    border-color        : transparent !important;
-    color               : #ffffff !important;
-}
-
-/* ==========================================================================
-   7. SIDEBAR (Modal Paramètres)
-   ========================================================================== */
-
-.settings-sidebar {
-    width               : 230px;
-    min-width           : 230px;
-    background          : var(--bg-subtle);
-    border-right        : 1px solid var(--modal-border);
-    padding             : 20px 12px 16px;
-    display             : flex;
-    flex-direction      : column;
-    justify-content     : space-between;
-    flex-shrink         : 0;
-}
-
-.settings-nav-vertical {
-    display             : flex;
-    flex-direction      : column;
-    gap                 : 3px;
-}
-
-.setting-nav-item {
-    display             : flex;
-    align-items         : center;
-    padding             : 10px 14px;
-    border-radius       : var(--radius-md);
-    color               : var(--text-secondary);
-    font-weight         : 600;
-    font-size           : 0.86rem;
-    font-family         : inherit;
-    text-align          : left;
-    border              : none;
-    background          : transparent;
-    cursor              : pointer;
-    transition          : all var(--transition-fast);
-    gap                 : 0;
-}
-
-.setting-nav-item i {
-    margin-right        : 10px;
-    width               : 16px;
-    font-size           : 0.82rem;
-    color               : var(--text-muted);
-    transition          : color var(--transition-fast);
-    flex-shrink         : 0;
-}
-
-.setting-nav-item:hover {
-    background          : var(--modal-bg);
-    color               : var(--text-main);
-}
-
-.setting-nav-item:hover i {
-    color               : var(--accent);
-}
-
-.setting-nav-item.active {
-    background          : var(--modal-bg);
-    color               : var(--accent);
-    box-shadow          : var(--shadow-sm);
-    border              : 1px solid var(--modal-border);
-}
-
-.setting-nav-item.active i {
-    color               : var(--accent);
-}
-
-/* ==========================================================================
-   8. MESSAGES D'ÉTAT
-   ========================================================================== */
-
-/* Erreur inline */
-
-.modal-error-inline {
-    display             : flex;
-    align-items         : center;
-    gap                 : 10px;
-    margin              : 0 30px 0 30px;
-    padding             : 11px 16px;
-    background          : var(--danger-soft);
-    color               : #b91c1c;
-    border              : 1px solid var(--danger-border);
-    border-left         : 3px solid var(--danger);
-    border-radius       : var(--radius-md);
-    font-size           : 0.85rem;
-    font-weight         : 600;
-    animation           : shakeError 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-}
-
-.modal-error-inline i {
-    font-size           : 1rem;
-    flex-shrink         : 0;
-}
-
-@keyframes shakeError {
-    10%, 90%    { transform: translateX(-2px); }
-    20%, 80%    { transform: translateX(3px); }
-    30%, 50%, 70% { transform: translateX(-4px); }
-    40%, 60%    { transform: translateX(4px); }
-}
-
-/* Message de verrouillage (offre acceptée) */
-
-#lock-msg {
-    display             : flex;
-    align-items         : center;
-    gap                 : 10px;
-    padding             : 11px 16px;
-    margin-bottom       : 22px;
-    background          : var(--warning-soft);
-    color               : var(--warning-text);
-    border              : 1px solid var(--warning-border);
-    border-radius       : var(--radius-md);
-    font-size           : 0.84rem;
-    font-weight         : 500;
-}
-
-#lock-msg i {
-    flex-shrink         : 0;
-    font-size           : 0.9rem;
-}
-
-/* ==========================================================================
-   9. TAGS / VILLES ÉTAPES
-   ========================================================================== */
-
-.tags-container {
-    display             : flex;
-    flex-wrap           : wrap;
-    gap                 : 7px;
-    margin-top          : 10px;
-}
-
-.tag {
-    display             : inline-flex;
-    align-items         : center;
-    gap                 : 5px;
-    background          : var(--accent-soft);
-    color               : var(--accent);
-    border              : 1px solid var(--accent-border);
-    padding             : 4px 11px;
-    border-radius       : 99px;
-    font-size           : 0.78rem;
-    font-weight         : 650;
-}
-
-/* ==========================================================================
-   10. BLOCS DE CAPACITÉS PAR ARRÊT (step 2)
-   ========================================================================== */
-
-.etape-block {
-    border              : 1.5px solid var(--modal-border);
-    border-radius       : var(--radius-lg);
-    padding             : 18px 20px;
-    margin-bottom       : 14px;
-    background          : var(--bg-subtle);
-    transition          : all var(--transition-fast);
-}
-
-.etape-block:last-child {
-    margin-bottom       : 0;
-}
-
-.etape-block:hover {
-    border-color        : var(--accent-border);
-    background          : var(--accent-soft);
-}
-
-.etape-block-header {
-    display             : flex;
-    align-items         : center;
-    gap                 : 10px;
-    margin-bottom       : 16px;
-}
-
-/* Badges de type d'arrêt */
-
-.etape-badge {
-    display             : inline-flex;
-    align-items         : center;
-    gap                 : 5px;
-    padding             : 4px 11px;
-    border-radius       : 99px;
-    font-size           : 0.68rem;
-    font-weight         : 800;
-    text-transform      : uppercase;
-    letter-spacing      : 0.06em;
-    white-space         : nowrap;
-    flex-shrink         : 0;
-}
-
-.etape-badge--depart {
-    background          : #dcfce7;
-    color               : #15803d;
-    border              : 1px solid #bbf7d0;
-}
-
-.etape-badge--etape {
-    background          : var(--accent-soft);
-    color               : #1d4ed8;
-    border              : 1px solid var(--accent-border);
-}
-
-.etape-badge--destination {
-    background          : #fef3c7;
-    color               : #b45309;
-    border              : 1px solid #fde68a;
-}
-
-.etape-ville {
-    font-size           : 0.97rem;
-    font-weight         : 700;
-    color               : var(--primary);
-    letter-spacing      : -0.01em;
-}
-
-/* ==========================================================================
-   11. NAVIGATION ENTRE ARRÊTS (step 2)
-   ========================================================================== */
-
-#arrets-nav {
-    margin-top          : 18px;
-}
-
-.arrets-stepper {
-    display             : flex;
-    align-items         : center;
-    justify-content     : center;
-    margin-bottom       : 14px;
-}
-
-.arret-dot {
-    width               : 8px;
-    height              : 8px;
-    border-radius       : 50%;
-    background          : var(--modal-border);
-    border              : 2px solid var(--modal-border);
-    transition          : all var(--transition-base);
-    flex-shrink         : 0;
-}
-
-.arret-dot.active {
-    background          : var(--accent);
-    border-color        : var(--accent);
-    box-shadow          : 0 0 0 3px rgba(59, 130, 246, 0.14);
-    transform           : scale(1.25);
-}
-
-.arret-dot.done {
-    background          : var(--success);
-    border-color        : var(--success);
-}
-
-.arret-line {
-    height              : 1.5px;
-    width               : 24px;
-    background          : var(--modal-border);
-    flex-shrink         : 0;
-}
-
-.arrets-nav-btns {
-    display             : flex;
-    justify-content     : space-between;
-    gap                 : 10px;
-    padding-top         : 14px;
-    border-top          : 1px solid var(--border-light);
-}
-
-.arrets-nav-btns button[disabled] {
-    opacity             : 0.38;
-    cursor              : not-allowed;
-    pointer-events      : none;
-}
-
-/* ==========================================================================
-   12. ONGLETS SETTINGS (sidebar tabs)
-   ========================================================================== */
-
-.settings-tab {
-    animation           : bodyFadeIn 0.2s ease both;
-}
-
-.settings-tab h2 {
-    font-size           : 1.1rem;
-    font-weight         : 750;
-    color               : var(--primary);
-    margin              : 0 0 4px 0;
-    letter-spacing      : -0.02em;
-}
-
-.tab-subtitle {
-    font-size           : 0.84rem;
-    color               : var(--text-muted);
-    margin              : 0 0 24px 0;
-    line-height         : 1.5;
-}
-
-/* Bandeau info camion */
-
-.vehicle-specs-banner {
-    display             : flex;
-    gap                 : 0;
-    border              : 1px solid var(--modal-border);
-    border-radius       : var(--radius-md);
-    overflow            : hidden;
-    margin-bottom       : 22px;
-}
-
-.spec-item {
-    flex                : 1;
-    display             : flex;
-    flex-direction      : column;
-    gap                 : 4px;
-    padding             : 13px 16px;
-    background          : var(--bg-subtle);
-    border-right        : 1px solid var(--modal-border);
-}
-
-.spec-item:last-child {
-    border-right        : none;
-}
-
-.spec-label {
-    font-size           : 0.72rem;
-    font-weight         : 700;
-    color               : var(--text-muted);
-    text-transform      : uppercase;
-    letter-spacing      : 0.05em;
-}
-
-.spec-label i {
-    margin-right        : 5px;
-    color               : var(--accent);
-}
-
-.spec-item strong {
-    font-size           : 0.95rem;
-    font-weight         : 700;
-    color               : var(--primary);
-}
-
-/* Options de statut (radio) */
-
-.status-options {
-    display             : flex;
-    flex-direction      : column;
-    gap                 : 10px;
-    margin-top          : 8px;
-}
-
-.status-option {
-    display             : flex;
-    align-items         : center;
-    gap                 : 14px;
-    padding             : 14px 18px;
-    border              : 1.5px solid var(--modal-border);
-    border-radius       : var(--radius-md);
-    cursor              : pointer;
-    transition          : all var(--transition-fast);
-    background          : var(--bg-subtle);
-}
-
-.status-option:hover {
-    border-color        : var(--accent-border);
-    background          : var(--accent-soft);
-}
-
-.status-option input[type="radio"] {
-    width               : 16px;
-    height              : 16px;
-    min-width           : 16px;
-    margin              : 0;
-    accent-color        : var(--accent);
-    cursor              : pointer;
-    padding             : 0;
-}
-
-.status-option:has(input:checked) {
-    border-color        : var(--accent);
-    background          : var(--accent-soft);
-    box-shadow          : 0 0 0 3px rgba(59, 130, 246, 0.08);
-}
-
-.status-desc {
-    display             : flex;
-    flex-direction      : column;
-    gap                 : 2px;
-}
-
-.status-desc strong {
-    font-size           : 0.9rem;
-    color               : var(--text-main);
-    font-weight         : 700;
-}
-
-.status-desc span {
-    font-size           : 0.8rem;
-    color               : var(--text-muted);
-    line-height         : 1.4;
-}
-/* ==========================================================================
-   AUTOCOMPLÉTION DES VILLES
-   ========================================================================== */
-
-.ville-ac-wrapper {
+/* --- LA CARTE PROFESSIONNELLE --- */
+.offre-item-card {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     position: relative;
-    width: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.ville-ac-wrapper input {
-    width: 100%;
+.offre-item-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--secondary);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
 }
 
-.ville-ac-dropdown {
-    display: none;
+/* --- STATUTS (Version Pilule) --- */
+.status-badge {
     position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
-    list-style: none;
-    margin: 0;
-    padding: 6px;
-    z-index: 9999;
-    max-height: 220px;
-    overflow-y: auto;
+    top: 20px;
+    right: 20px;
+    font-size: 0.65rem;
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 2;
+    border: 1px solid transparent;
 }
 
-.ville-ac-item {
+/* COULEURS DES STATUTS */
+.status-publiee { 
+    background-color: #dcfce7 !important; 
+    color: #16a34a !important; 
+    border-color: #bbf7d0 !important;
+}
+
+.status-plannifiee { 
+    background-color: #fef3c7 !important; 
+    color: #d97706 !important; 
+    border-color: #fde68a !important;
+}
+
+.status-brouillon { 
+    background-color: #f1f5f9 !important; 
+    color: #64748b !important; 
+    border-color: #e2e8f0 !important;
+}
+
+/* Statut Acceptée — bleu, lecture seule */
+.status-acceptee {
+    background-color: #dbeafe !important;
+    color: #1d4ed8 !important;
+    border-color: #bfdbfe !important;
+}
+
+/* --- SECTION VÉHICULE --- */
+.truck-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.truck-icon {
+    width: 48px;
+    height: 48px;
+    background: #f1f5f9;
+    color: var(--secondary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+.truck-info .label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.truck-info .value {
+    font-size: 1.1rem;
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* --- SECTION ITINÉRAIRE --- */
+.route-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+}
+
+.route-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.route-visual {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 9px 12px;
-    border-radius: 7px;
-    font-size: 0.88rem;
-    color: #1e293b;
-    cursor: pointer;
-    transition: background 0.12s ease;
+    color: #cbd5e1;
 }
 
-.ville-ac-item i {
-    color: #3b82f6;
-    font-size: 0.75rem;
+.route-visual .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--secondary);
+    border-radius: 50%;
+}
+
+.route-visual .line {
+    width: 30px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #cbd5e1, #cbd5e1 2px, transparent 2px, transparent 4px);
+}
+
+/* --- FOOTER & ACTIONS --- */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.capacity-pill {
+    background: #ecfdf5;
+    color: #065f46;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.capacity-pill i { color: #10b981; }
+
+.action-group {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border-color);
+    margin: 0 4px;
+}
+
+.btn-view:hover  { background: #eff6ff; color: #1d4ed8; }
+.btn-edit:hover  { background: #eff6ff; color: var(--secondary); }
+.btn-delete:hover { background: #fff1f2; color: #e11d48; }
+
+/* --- BANNIÈRE VERROUILLAGE MODALE --- */
+.locked-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.locked-banner i {
+    font-size: 1rem;
+    color: #d97706;
     flex-shrink: 0;
 }
+/* Statut Fin de publication — orange */
+.status-fin-publication {
+    background-color: #fff7ed !important;
+    color: #c2410c !important;
+    border-color: #fed7aa !important;
+    font-size: 0.55rem !important;
+    padding: 5px 8px !important;
+    letter-spacing: 0.02em !important;
+}
 
-.ville-ac-item:hover,
-.ville-ac-item.active {
+/* Statut Expirée — gris neutre */
+.status-expiree {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Bouton Renvoyer */
+.btn-renvoyer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 12px;
     background: #eff6ff;
+    color: #2563eb;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.btn-renvoyer:hover {
+    background: #dbeafe;
     color: #1d4ed8;
 }
 
-.ville-ac-item.active i {
-    color: #1d4ed8;
+/* Footer quand statut = Fin de publication */
+.card-footer--expired {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
 }
 
-/* Feedback visuel sur l'input lui-même */
-input.ville-valid {
-    border-color: #22c55e !important;
-    background-color: #f0fdf4 !important;
+.card-footer--expired .action-group {
+    border: none;
+    background: transparent;
+    padding: 0;
+    width: 100%;
 }
 
-input.ville-invalid {
-    border-color: #ef4444 !important;
-    background-color: #fff1f2 !important;
+.card-footer--expired .btn-renvoyer {
+    width: 100%;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    justify-content: center;
 }
