@@ -569,6 +569,91 @@ function closeDeleteModal() {
    11. FERMETURE AU CLIC SUR L'OVERLAY
    ========================================================================== */
 
+/* ==========================================================================
+   12. MODALE DÉTAILS (lecture seule — offre Acceptée)
+   ========================================================================== */
+
+async function ouvrirDetailsOffre(offreId) {
+    const modal = document.getElementById('detailsOffreModal');
+    const body  = document.getElementById('details-offre-body');
+    if (!modal || !body) return;
+
+    body.innerHTML = '<p style="color:#64748b;">Chargement...</p>';
+    modal.style.display = 'flex';
+
+    const username = localStorage.getItem('currentUser') || 'admin';
+
+    try {
+        const res = await fetch(`/api/offres/${username}/${offreId}`);
+        if (!res.ok) throw new Error('Introuvable');
+        const o = await res.json();
+
+        const snap  = o.snapshot_camion || {};
+        const cycle = o.snapshot_cycle  || {};
+
+        const etapesHtml = (o.capacites_par_etape || []).map((e, idx) => {
+            const isLast = idx === (o.capacites_par_etape.length - 1);
+            const icon   = idx === 0 ? '📍' : isLast ? '🏁' : '🔄';
+            const caps   = isLast
+                ? '<span style="color:#94a3b8;font-size:0.8rem;">Déchargement</span>'
+                : `<span style="font-size:0.82rem;color:#475569;">
+                       ${e.charge_disponible ?? '--'} kg &nbsp;·&nbsp;
+                       ${e.longueur ?? '--'} × ${e.largeur ?? '--'} × ${e.hauteur ?? '--'} m
+                   </span>`;
+            return `
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #f1f5f9;">
+                <span style="font-size:1.1rem;margin-top:2px;">${icon}</span>
+                <div style="flex:1;">
+                    <strong style="font-size:0.92rem;color:#1e293b;">${e.ville}</strong>
+                    <span style="color:#94a3b8;font-size:0.8rem;margin-left:8px;">${e.heure || '--:--'}</span>
+                    <div style="margin-top:3px;">${caps}</div>
+                </div>
+            </div>`;
+        }).join('');
+
+        body.innerHTML = `
+            <div style="display:flex;gap:10px;align-items:center;background:#dbeafe;border:1px solid #bfdbfe;border-radius:10px;padding:12px 16px;">
+                <i class="fa-solid fa-lock" style="color:#1d4ed8;"></i>
+                <span style="font-size:0.88rem;color:#1e40af;font-weight:600;">Offre acceptée — lecture seule</span>
+            </div>
+
+            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                    <span style="font-size:0.72rem;text-transform:uppercase;font-weight:700;color:#94a3b8;">Véhicule</span>
+                    <p style="margin:4px 0 0;font-weight:700;color:#1e293b;">${o.camion_id}</p>
+                    <p style="margin:2px 0 0;font-size:0.8rem;color:#64748b;">${snap.long ?? '--'} m · ${snap.poids ?? '--'} kg max</p>
+                </div>
+                <div>
+                    <span style="font-size:0.72rem;text-transform:uppercase;font-weight:700;color:#94a3b8;">Trajet</span>
+                    <p style="margin:4px 0 0;font-weight:700;color:#1e293b;">${o.depart} → ${o.destination}</p>
+                    <p style="margin:2px 0 0;font-size:0.8rem;color:#64748b;">${o.date || '--'}</p>
+                </div>
+                <div>
+                    <span style="font-size:0.72rem;text-transform:uppercase;font-weight:700;color:#94a3b8;">Tarif</span>
+                    <p style="margin:4px 0 0;font-weight:700;color:#1e293b;">${o.tarif_euro_m3_km ?? '--'} € / km</p>
+                </div>
+                <div>
+                    <span style="font-size:0.72rem;text-transform:uppercase;font-weight:700;color:#94a3b8;">Marchandise</span>
+                    <p style="margin:4px 0 0;font-weight:700;color:#1e293b;">${o.type_marchandise || '--'}</p>
+                </div>
+            </div>
+
+            <div>
+                <p style="font-size:0.78rem;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:0 0 4px;">Arrêts & capacités</p>
+                ${etapesHtml}
+            </div>
+        `;
+    } catch (err) {
+        body.innerHTML = '<p style="color:#ef4444;">Impossible de charger les détails.</p>';
+    }
+}
+
+function fermerDetailsOffre() {
+    const modal = document.getElementById('detailsOffreModal');
+    if (modal) modal.style.display = 'none';
+}
+
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('settingsModal')?.addEventListener('click', (e) => {
         if (e.target === document.getElementById('settingsModal')) closeSettingsModal();
@@ -577,3 +662,71 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
     });
 });
+/* ==========================================================================
+   13. RENVOYER OFFRE (Fin de publication → mise à jour du délai)
+   ========================================================================== */
+
+function renvoyerOffre(offreId) {
+    const modal = document.getElementById('renvoyerOffreModal');
+    if (!modal) return;
+
+    const dateEl  = document.getElementById('renvoyer-expire-date');
+    const heureEl = document.getElementById('renvoyer-expire-heure');
+    if (dateEl)  dateEl.value  = '';
+    if (heureEl) heureEl.value = '';
+
+    const errEl = document.getElementById('renvoyer-error');
+    if (errEl) errEl.style.display = 'none';
+
+    modal.dataset.offreId = offreId;
+    modal.style.display = 'flex';
+}
+
+function fermerRenvoyerOffre() {
+    const modal = document.getElementById('renvoyerOffreModal');
+    if (modal) modal.style.display = 'none';
+}
+
+async function confirmerRenvoyerOffre() {
+    const modal   = document.getElementById('renvoyerOffreModal');
+    const offreId = parseInt(modal?.dataset.offreId);
+    if (!offreId) return;
+
+    const dateVal  = document.getElementById('renvoyer-expire-date')?.value;
+    const heureVal = document.getElementById('renvoyer-expire-heure')?.value;
+    const errEl    = document.getElementById('renvoyer-error');
+
+    if (!dateVal || !heureVal) {
+        if (errEl) { errEl.textContent = "Veuillez renseigner la date et l'heure."; errEl.style.display = 'block'; }
+        return;
+    }
+    if (errEl) errEl.style.display = 'none';
+
+    const username = localStorage.getItem('currentUser') || 'admin';
+
+    try {
+        const res = await fetch(`/api/offres/${username}/${offreId}`);
+        if (!res.ok) throw new Error();
+        const offre = await res.json();
+
+        // Restaurer l'ancien statut ou Planifiée par défaut
+        const ancienStatut = offre.statut_avant || 'Planifiée';
+
+        const payload = { ...offre, expire_date: dateVal, expire_heure: heureVal, statut: ancienStatut, statut_avant: null };
+
+        const resPut = await fetch(`/api/offres/${username}/${offreId}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
+        });
+
+        if (resPut.ok) {
+            fermerRenvoyerOffre();
+            location.reload();
+        } else {
+            if (errEl) { errEl.textContent = 'Erreur lors de la sauvegarde.'; errEl.style.display = 'block'; }
+        }
+    } catch {
+        if (errEl) { errEl.textContent = 'Erreur réseau.'; errEl.style.display = 'block'; }
+    }
+}
