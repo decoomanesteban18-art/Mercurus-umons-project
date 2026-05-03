@@ -612,11 +612,6 @@ async function ouvrirDetailsOffre(offreId) {
         }).join('');
 
         body.innerHTML = `
-            <div style="display:flex;gap:10px;align-items:center;background:#dbeafe;border:1px solid #bfdbfe;border-radius:10px;padding:12px 16px;">
-                <i class="fa-solid fa-lock" style="color:#1d4ed8;"></i>
-                <span style="font-size:0.88rem;color:#1e40af;font-weight:600;">Offre acceptée — lecture seule</span>
-            </div>
-
             <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div>
                     <span style="font-size:0.72rem;text-transform:uppercase;font-weight:700;color:#94a3b8;">Véhicule</span>
