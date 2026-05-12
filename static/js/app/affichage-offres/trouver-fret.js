@@ -156,7 +156,7 @@ function injecterBarreRecherche() {
             <span style="font-weight:700;font-size:0.95rem;color:#0f172a;">Filtrer les offres</span>
             <span id="search-count" style="margin-left:auto;font-size:0.78rem;color:#64748b;font-weight:500;"></span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end;">
             <div>
                 <label style="display:block;font-size:0.75rem;font-weight:600;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em;">
                     <i class="fa-solid fa-circle-dot" style="color:#2563eb;"></i> Départ
@@ -190,7 +190,7 @@ function injecterBarreRecherche() {
                     ${optTypes}
                 </select>
             </div>
-            <div style="display:flex;gap:8px;">
+            <div style="display:flex;gap:8px;align-self:flex-end;">
                 <button onclick="appliquerFiltres()" style="padding:9px 18px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;white-space:nowrap;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
                     <i class="fa-solid fa-magnifying-glass"></i> Rechercher
                 </button>
