@@ -657,17 +657,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
     });
 });
+
+function formatDateFR(dateStr) {
+    if (!dateStr) return dateStr;
+    const [y, m, d] = dateStr.split('-');
+    return `${d}/${m}/${y}`;
+}
 /* ==========================================================================
    13. RENVOYER OFFRE (Fin de publication → mise à jour du délai)
    ========================================================================== */
 
-function renvoyerOffre(offreId) {
+function renvoyerOffre(offreId, dateTrajet) {
     const modal = document.getElementById('renvoyerOffreModal');
     if (!modal) return;
 
     const dateEl  = document.getElementById('renvoyer-expire-date');
     const heureEl = document.getElementById('renvoyer-expire-heure');
-    if (dateEl)  dateEl.value  = '';
+    if (dateEl)  { dateEl.value = ''; dateEl.max = dateTrajet || ''; }
     if (heureEl) heureEl.value = '';
 
     const errEl = document.getElementById('renvoyer-error');
@@ -703,6 +709,17 @@ async function confirmerRenvoyerOffre() {
         const res = await fetch(`/api/offres/${username}/${offreId}`);
         if (!res.ok) throw new Error();
         const offre = await res.json();
+
+        // Validation : la date d'expiration doit être strictement inférieure à la date du trajet
+        if (offre.date && dateVal >= offre.date) {
+            if (errEl) {
+                errEl.querySelector('span')
+                    ? errEl.querySelector('span').textContent = `La date doit être antérieure à la date du trajet (${formatDateFR(offre.date)}).`
+                    : errEl.textContent = `La date doit être antérieure à la date du trajet (${formatDateFR(offre.date)}).`;
+                errEl.style.display = 'block';
+            }
+            return;
+        }
 
         // Restaurer l'ancien statut ou Planifiée par défaut
         const ancienStatut = offre.statut_avant || 'Planifiée';
