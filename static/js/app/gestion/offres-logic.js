@@ -82,7 +82,7 @@ function renderOffreCard(offre) {
     if (statut === 'Brouillon' || statut === 'Planifiée' || statut === 'Publiée') {
         actionBtn = '<button class="btn-action btn-edit" onclick="openSettingsModal(' + offre.id + ')" title="Modifier"><i class="fa-solid fa-pen-to-square"></i></button>';
     } else if (statut === 'Fin de publication') {
-        actionBtn = '<button class="btn-renvoyer" onclick="renvoyerOffre(' + offre.id + ')" title="Renvoyer l\'offre"><i class="fa-solid fa-rotate-right"></i> Renvoyer</button>';
+        actionBtn = '<button class="btn-renvoyer" onclick="renvoyerOffre(' + offre.id + ', \'' + (offre.date || '') + '\')" title="Renvoyer l\'offre"><i class="fa-solid fa-rotate-right"></i> Renvoyer</button>';
     } else {
         // Acceptée, Expirée
         actionBtn = '<button class="btn-action btn-view" onclick="ouvrirDetailsOffre(' + offre.id + ')" title="Voir les détails"><i class="fa-solid fa-eye"></i></button>';
