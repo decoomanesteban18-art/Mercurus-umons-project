@@ -657,12 +657,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === document.getElementById('deleteModal')) closeDeleteModal();
     });
 });
-
-function formatDateFR(dateStr) {
-    if (!dateStr) return dateStr;
-    const [y, m, d] = dateStr.split('-');
-    return `${d}/${m}/${y}`;
-}
 /* ==========================================================================
    13. RENVOYER OFFRE (Fin de publication → mise à jour du délai)
    ========================================================================== */
@@ -710,12 +704,11 @@ async function confirmerRenvoyerOffre() {
         if (!res.ok) throw new Error();
         const offre = await res.json();
 
-        // Validation : la date d'expiration doit être strictement inférieure à la date du trajet
+        // Validation : la date d'expiration doit être strictement antérieure à la date du trajet
         if (offre.date && dateVal >= offre.date) {
             if (errEl) {
-                errEl.querySelector('span')
-                    ? errEl.querySelector('span').textContent = `La date doit être antérieure à la date du trajet (${formatDateFR(offre.date)}).`
-                    : errEl.textContent = `La date doit être antérieure à la date du trajet (${formatDateFR(offre.date)}).`;
+                const d = offre.date.split('-');
+                errEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>La date doit être antérieure à la date du trajet (${d[2]}/${d[1]}/${d[0]}).</span>`;
                 errEl.style.display = 'block';
             }
             return;
